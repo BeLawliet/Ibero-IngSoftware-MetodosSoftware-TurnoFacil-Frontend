@@ -1,0 +1,44 @@
+# Dependencias
+node_modules/
+
+# Compilaciones y cobertura
+dist/
+out-tsc/
+coverage/
+
+# Caché de Angular
+.angular/cache/
+
+# Archivos locales y variables de entorno
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editores e IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
+*.code-workspace
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+
+# Archivos temporales
+*.swp
+*.swo
+*.tmp
+

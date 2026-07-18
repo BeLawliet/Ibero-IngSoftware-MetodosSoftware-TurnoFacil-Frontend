@@ -25,6 +25,11 @@ export const routes: Routes = [
             ({ DashboardPage }) => DashboardPage,
           ),
       },
+      {
+        path: 'clientes',
+        loadComponent: () =>
+          import('./features/clients/pages/clients/clients').then(({ ClientsPage }) => ClientsPage),
+      },
     ],
   },
   {

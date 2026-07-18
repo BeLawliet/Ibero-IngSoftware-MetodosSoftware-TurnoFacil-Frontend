@@ -39,6 +39,16 @@ describe('application routes', () => {
     expect(TestBed.inject(Router).url).toBe('/dashboard');
   });
 
+  it('should load clients inside the authenticated shell', async () => {
+    const harness = await RouterTestingHarness.create();
+
+    const component = await harness.navigateByUrl('/clientes', AuthenticatedShell);
+
+    expect(component).toBeInstanceOf(AuthenticatedShell);
+    expect(document.querySelector('app-clients-page')).toBeTruthy();
+    expect(TestBed.inject(Router).url).toBe('/clientes');
+  });
+
   it('should redirect unknown paths to login', async () => {
     const harness = await RouterTestingHarness.create();
 

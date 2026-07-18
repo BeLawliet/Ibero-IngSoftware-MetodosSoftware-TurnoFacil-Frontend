@@ -1,0 +1,526 @@
+<div class="min-w-0 p-4 sm:p-6 lg:p-8">
+  <header class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-extrabold tracking-[-0.035em] text-brand-text sm:text-3xl">
+        Clientes
+      </h1>
+      <p class="text-brand-muted mt-2">Administra la información de los clientes registrados.</p>
+    </div>
+    <button
+      type="button"
+      class="bg-brand-teal hover:bg-brand-teal-hover focus-visible:ring-brand-teal inline-flex min-h-12 items-center justify-center gap-2 self-start rounded-xl px-5 font-bold text-white shadow-sm outline-none transition focus-visible:ring-4 focus-visible:ring-offset-2 sm:self-auto"
+      (click)="openCreateDialog()"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        class="size-5"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <path d="M12 5v14M5 12h14"></path>
+      </svg>
+      Nuevo cliente
+    </button>
+  </header>
+
+  @if (confirmationMessage()) {
+    <div
+      class="mt-5 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800"
+      role="status"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        class="size-5 shrink-0"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="m7.5 12 3 3 6-7"></path>
+      </svg>
+      {{ confirmationMessage() }}
+    </div>
+  }
+
+  <section class="mt-7 grid gap-4 sm:grid-cols-3" aria-label="Resumen de clientes">
+    <article
+      class="border-brand-border flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm"
+    >
+      <span
+        class="bg-brand-teal-soft text-brand-teal grid size-11 shrink-0 place-items-center rounded-xl"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="size-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <path d="M16 20v-1.5a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4V20"></path>
+          <circle cx="9.5" cy="7" r="3.5"></circle>
+          <path d="M16 4.5a3.5 3.5 0 0 1 0 6.8M18 14.8a4 4 0 0 1 3 3.7V20"></path>
+        </svg>
+      </span>
+      <div>
+        <p class="text-brand-muted text-sm font-semibold">Total de clientes</p>
+        <p class="mt-1 text-2xl font-extrabold text-brand-text">{{ summary().total }}</p>
+      </div>
+    </article>
+    <article
+      class="border-brand-border flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm"
+    >
+      <span
+        class="grid size-11 shrink-0 place-items-center rounded-xl bg-emerald-50 text-emerald-600"
+        aria-hidden="true"
+      >
+        <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="m7.5 12 3 3 6-7"></path>
+        </svg>
+      </span>
+      <div>
+        <p class="text-brand-muted text-sm font-semibold">Clientes activos</p>
+        <p class="mt-1 text-2xl font-extrabold text-brand-text">{{ summary().active }}</p>
+      </div>
+    </article>
+    <article
+      class="border-brand-border flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm"
+    >
+      <span
+        class="grid size-11 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="size-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <path d="M12 20a8 8 0 1 0-8-8"></path>
+          <path d="M4 5v5h5M12 8v4l3 2"></path>
+        </svg>
+      </span>
+      <div>
+        <p class="text-brand-muted text-sm font-semibold">Nuevos este mes</p>
+        <p class="mt-1 text-2xl font-extrabold text-brand-text">{{ summary().newThisMonth }}</p>
+      </div>
+    </article>
+  </section>
+
+  <section
+    class="border-brand-border mt-6 rounded-2xl border bg-white p-4 shadow-sm sm:p-5"
+    aria-label="Búsqueda y filtros de clientes"
+  >
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-end">
+      <div class="min-w-0 flex-1">
+        <label for="client-search" class="mb-2 block text-sm font-bold text-slate-700"
+          >Buscar clientes</label
+        >
+        <div class="relative">
+          <svg
+            viewBox="0 0 24 24"
+            class="text-brand-muted pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+          >
+            <circle cx="10.5" cy="10.5" r="6.5"></circle>
+            <path d="m15.5 15.5 5 5"></path>
+          </svg>
+          <input
+            id="client-search"
+            type="search"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border bg-slate-50 pr-4 pl-12 text-sm outline-none transition focus:ring-4"
+            placeholder="Nombre, correo o teléfono"
+            [value]="searchTerm()"
+            (input)="updateSearch($event)"
+          />
+        </div>
+      </div>
+      <div class="lg:w-52">
+        <label for="client-status" class="mb-2 block text-sm font-bold text-slate-700"
+          >Estado</label
+        >
+        <select
+          id="client-status"
+          class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border bg-slate-50 px-4 text-sm outline-none transition focus:ring-4"
+          [value]="statusFilter()"
+          (change)="updateStatusFilter($event)"
+        >
+          <option>Todos</option>
+          <option>Activos</option>
+          <option>Inactivos</option>
+        </select>
+      </div>
+      @if (hasFilters()) {
+        <button
+          type="button"
+          class="border-brand-border hover:bg-slate-50 focus-visible:ring-brand-teal h-12 rounded-xl border px-4 text-sm font-bold text-slate-700 outline-none focus-visible:ring-2"
+          (click)="clearFilters()"
+        >
+          Limpiar filtros
+        </button>
+      }
+    </div>
+    <p class="text-brand-muted mt-3 text-sm" aria-live="polite">
+      {{ filteredClients().length }} clientes encontrados
+    </p>
+  </section>
+
+  <section
+    class="border-brand-border mt-6 min-w-0 rounded-2xl border bg-white shadow-sm"
+    aria-labelledby="clients-list-title"
+  >
+    <div class="border-brand-border border-b px-5 py-5 sm:px-6">
+      <h2 id="clients-list-title" class="text-lg font-bold text-brand-text">
+        Clientes registrados
+      </h2>
+    </div>
+
+    @if (filteredClients().length === 0) {
+      <div class="px-6 py-14 text-center">
+        <p class="font-bold text-brand-text">No se encontraron clientes</p>
+        <p class="text-brand-muted mt-2 text-sm">Prueba con otros criterios de búsqueda.</p>
+      </div>
+    } @else {
+      <div class="hidden md:block">
+        <table class="w-full table-fixed border-collapse text-left">
+          <thead class="bg-slate-50 text-xs tracking-wide text-slate-500 uppercase">
+            <tr>
+              <th scope="col" class="w-[23%] px-5 py-3 font-semibold">Cliente</th>
+              <th scope="col" class="w-[22%] px-3 py-3 font-semibold">Correo electrónico</th>
+              <th scope="col" class="w-[15%] px-3 py-3 font-semibold">Teléfono</th>
+              <th scope="col" class="w-[15%] px-3 py-3 font-semibold">Última cita</th>
+              <th scope="col" class="w-[13%] px-3 py-3 font-semibold">Estado</th>
+              <th scope="col" class="w-[12%] px-3 py-3 text-right font-semibold">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-brand-border divide-y">
+            @for (client of filteredClients(); track client.id) {
+              <tr class="text-sm">
+                <td class="px-5 py-4">
+                  <div class="flex min-w-0 items-center gap-3">
+                    <span
+                      class="bg-brand-teal-soft text-brand-teal grid size-10 shrink-0 place-items-center rounded-full text-xs font-extrabold"
+                      aria-hidden="true"
+                      >{{ initials(client) }}</span
+                    ><span class="truncate font-bold text-brand-text"
+                      >{{ client.firstName }} {{ client.lastName }}</span
+                    >
+                  </div>
+                </td>
+                <td class="text-brand-muted truncate px-3 py-4">{{ client.email }}</td>
+                <td class="text-brand-muted px-3 py-4">{{ client.phone }}</td>
+                <td class="text-brand-muted px-3 py-4">{{ client.lastAppointment }}</td>
+                <td class="px-3 py-4">
+                  <span
+                    class="inline-flex rounded-full px-2.5 py-1 text-xs font-bold ring-1 ring-inset"
+                    [class]="
+                      client.active
+                        ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/15'
+                        : 'bg-slate-100 text-slate-600 ring-slate-500/15'
+                    "
+                    >{{ client.active ? 'Activo' : 'Inactivo' }}</span
+                  >
+                </td>
+                <td class="relative px-3 py-4 text-right">
+                  <button
+                    type="button"
+                    class="hover:bg-slate-100 focus-visible:ring-brand-teal inline-grid size-10 place-items-center rounded-lg text-slate-600 outline-none focus-visible:ring-2"
+                    [attr.aria-label]="'Acciones para ' + client.firstName + ' ' + client.lastName"
+                    [attr.aria-expanded]="actionsClientId() === client.id"
+                    (click)="toggleActions(client.id)"
+                  >
+                    <svg viewBox="0 0 24 24" class="size-5" fill="currentColor" aria-hidden="true">
+                      <circle cx="5" cy="12" r="1.7"></circle>
+                      <circle cx="12" cy="12" r="1.7"></circle>
+                      <circle cx="19" cy="12" r="1.7"></circle>
+                    </svg>
+                  </button>
+                  @if (actionsClientId() === client.id) {
+                    <div
+                      class="border-brand-border absolute top-13 right-3 z-20 w-40 rounded-xl border bg-white p-1.5 text-left shadow-lg"
+                      role="menu"
+                    >
+                      <button
+                        type="button"
+                        role="menuitem"
+                        class="hover:bg-slate-50 focus-visible:bg-slate-50 w-full rounded-lg px-3 py-2 text-left text-sm font-semibold outline-none"
+                        (click)="openEditDialog(client)"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        class="hover:bg-slate-50 focus-visible:bg-slate-50 w-full rounded-lg px-3 py-2 text-left text-sm font-semibold outline-none"
+                        (click)="requestStatusChange(client)"
+                      >
+                        {{ client.active ? 'Desactivar' : 'Activar' }}
+                      </button>
+                    </div>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <ul class="divide-brand-border divide-y md:hidden">
+        @for (client of filteredClients(); track client.id) {
+          <li class="p-5">
+            <div class="flex items-start gap-3">
+              <span
+                class="bg-brand-teal-soft text-brand-teal grid size-11 shrink-0 place-items-center rounded-full text-xs font-extrabold"
+                aria-hidden="true"
+                >{{ initials(client) }}</span
+              >
+              <div class="min-w-0 flex-1">
+                <p class="truncate font-bold text-brand-text">
+                  {{ client.firstName }} {{ client.lastName }}
+                </p>
+                <p class="text-brand-muted mt-1 truncate text-sm">{{ client.email }}</p>
+              </div>
+              <span
+                class="inline-flex shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ring-1 ring-inset"
+                [class]="
+                  client.active
+                    ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/15'
+                    : 'bg-slate-100 text-slate-600 ring-slate-500/15'
+                "
+                >{{ client.active ? 'Activo' : 'Inactivo' }}</span
+              >
+            </div>
+            <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <dt class="text-brand-muted text-xs">Teléfono</dt>
+                <dd class="mt-1 font-semibold text-slate-700">{{ client.phone }}</dd>
+              </div>
+              <div>
+                <dt class="text-brand-muted text-xs">Última cita</dt>
+                <dd class="mt-1 font-semibold text-slate-700">{{ client.lastAppointment }}</dd>
+              </div>
+            </dl>
+            <div class="mt-4 flex gap-2">
+              <button
+                type="button"
+                class="border-brand-border focus-visible:ring-brand-teal flex-1 rounded-lg border px-3 py-2 text-sm font-bold outline-none focus-visible:ring-2"
+                (click)="openEditDialog(client)"
+              >
+                Editar</button
+              ><button
+                type="button"
+                class="border-brand-border focus-visible:ring-brand-teal flex-1 rounded-lg border px-3 py-2 text-sm font-bold outline-none focus-visible:ring-2"
+                (click)="requestStatusChange(client)"
+              >
+                {{ client.active ? 'Desactivar' : 'Activar' }}
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <dialog
+    #clientDialog
+    class="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-2xl bg-white p-0 shadow-2xl"
+    aria-labelledby="client-dialog-title"
+    (cancel)="handleClientDialogCancel($event)"
+    (click)="closeFromBackdrop($event, clientDialog)"
+  >
+    <div class="border-brand-border flex items-center justify-between border-b px-5 py-4 sm:px-6">
+      <div>
+        <h2 id="client-dialog-title" class="text-xl font-extrabold text-brand-text">
+          {{ formMode() === 'create' ? 'Nuevo cliente' : 'Editar cliente' }}
+        </h2>
+        <p class="text-brand-muted mt-1 text-sm">Completa la información del cliente.</p>
+      </div>
+      <button
+        type="button"
+        class="hover:bg-slate-100 focus-visible:ring-brand-teal grid size-10 place-items-center rounded-lg outline-none focus-visible:ring-2"
+        aria-label="Cerrar formulario de cliente"
+        (click)="closeClientDialog()"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="size-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path d="m6 6 12 12M18 6 6 18"></path>
+        </svg>
+      </button>
+    </div>
+    <form class="p-5 sm:p-6" [formGroup]="clientForm" (ngSubmit)="saveClient()" novalidate>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="first-name" class="mb-2 block text-sm font-bold text-slate-700">Nombres</label
+          ><input
+            id="first-name"
+            formControlName="firstName"
+            autocomplete="given-name"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border px-4 outline-none focus:ring-4"
+            [class.border-brand-error]="showError('firstName')"
+            [attr.aria-invalid]="showError('firstName')"
+            [attr.aria-describedby]="showError('firstName') ? 'first-name-error' : null"
+          />
+          @if (showError('firstName')) {
+            <p id="first-name-error" class="text-brand-error mt-2 text-sm" role="alert">
+              Los nombres son obligatorios.
+            </p>
+          }
+        </div>
+        <div>
+          <label for="last-name" class="mb-2 block text-sm font-bold text-slate-700"
+            >Apellidos</label
+          ><input
+            id="last-name"
+            formControlName="lastName"
+            autocomplete="family-name"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border px-4 outline-none focus:ring-4"
+            [class.border-brand-error]="showError('lastName')"
+            [attr.aria-invalid]="showError('lastName')"
+            [attr.aria-describedby]="showError('lastName') ? 'last-name-error' : null"
+          />
+          @if (showError('lastName')) {
+            <p id="last-name-error" class="text-brand-error mt-2 text-sm" role="alert">
+              Los apellidos son obligatorios.
+            </p>
+          }
+        </div>
+        <div>
+          <label for="client-email" class="mb-2 block text-sm font-bold text-slate-700"
+            >Correo electrónico</label
+          ><input
+            id="client-email"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border px-4 outline-none focus:ring-4"
+            [class.border-brand-error]="showError('email')"
+            [attr.aria-invalid]="showError('email')"
+            [attr.aria-describedby]="showError('email') ? 'client-email-error' : null"
+          />
+          @if (showError('email')) {
+            <p id="client-email-error" class="text-brand-error mt-2 text-sm" role="alert">
+              {{
+                clientForm.controls.email.hasError('required')
+                  ? 'El correo electrónico es obligatorio.'
+                  : 'Introduce un correo electrónico válido.'
+              }}
+            </p>
+          }
+        </div>
+        <div>
+          <label for="client-phone" class="mb-2 block text-sm font-bold text-slate-700"
+            >Teléfono</label
+          ><input
+            id="client-phone"
+            type="tel"
+            formControlName="phone"
+            autocomplete="tel"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border px-4 outline-none focus:ring-4"
+            [class.border-brand-error]="showError('phone')"
+            [attr.aria-invalid]="showError('phone')"
+            [attr.aria-describedby]="showError('phone') ? 'client-phone-error' : null"
+          />
+          @if (showError('phone')) {
+            <p id="client-phone-error" class="text-brand-error mt-2 text-sm" role="alert">
+              El teléfono es obligatorio.
+            </p>
+          }
+        </div>
+      </div>
+      <div class="mt-5">
+        <label for="client-notes" class="mb-2 block text-sm font-bold text-slate-700"
+          >Observaciones <span class="text-brand-muted font-normal">(opcional)</span></label
+        ><textarea
+          id="client-notes"
+          formControlName="notes"
+          rows="3"
+          class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 w-full resize-y rounded-xl border px-4 py-3 outline-none focus:ring-4"
+        ></textarea>
+      </div>
+      <label class="mt-5 flex items-center gap-3 text-sm font-bold text-slate-700"
+        ><input
+          type="checkbox"
+          formControlName="active"
+          class="text-brand-teal focus:ring-brand-teal size-5 rounded border-slate-300"
+        />
+        Estado activo</label
+      >
+      <div
+        class="border-brand-border mt-6 flex flex-col-reverse gap-3 border-t pt-5 sm:flex-row sm:justify-end"
+      >
+        <button
+          type="button"
+          class="border-brand-border focus-visible:ring-brand-teal min-h-11 rounded-xl border px-5 font-bold text-slate-700 outline-none focus-visible:ring-2"
+          (click)="closeClientDialog()"
+        >
+          Cancelar</button
+        ><button
+          type="submit"
+          class="bg-brand-teal hover:bg-brand-teal-hover focus-visible:ring-brand-teal min-h-11 rounded-xl px-5 font-bold text-white outline-none focus-visible:ring-4"
+        >
+          Guardar cliente
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog
+    #statusDialog
+    class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl bg-white p-0 shadow-2xl"
+    aria-labelledby="status-dialog-title"
+    (cancel)="handleStatusDialogCancel($event)"
+    (click)="closeFromBackdrop($event, statusDialog)"
+  >
+    <div class="p-6">
+      <span
+        class="grid size-12 place-items-center rounded-full bg-amber-50 text-amber-600"
+        aria-hidden="true"
+        ><svg viewBox="0 0 24 24" class="size-6" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 3 2.8 19h18.4Z"></path>
+          <path d="M12 9v4M12 16.5v.1"></path></svg
+      ></span>
+      <h2 id="status-dialog-title" class="mt-4 text-xl font-extrabold text-brand-text">
+        Confirmar cambio de estado
+      </h2>
+      @if (pendingStatusClient(); as client) {
+        <p class="text-brand-muted mt-2">
+          {{ client.active ? '¿Deseas desactivar a ' : '¿Deseas activar a '
+          }}<strong class="text-brand-text">{{ client.firstName }} {{ client.lastName }}</strong
+          >?
+        </p>
+      }
+      <p class="text-brand-muted mt-2 text-sm">
+        El cliente no será eliminado y podrá cambiarse nuevamente.
+      </p>
+      <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <button
+          type="button"
+          class="border-brand-border focus-visible:ring-brand-teal min-h-11 rounded-xl border px-5 font-bold text-slate-700 outline-none focus-visible:ring-2"
+          (click)="cancelStatusChange()"
+        >
+          Cancelar</button
+        ><button
+          type="button"
+          class="bg-brand-teal hover:bg-brand-teal-hover focus-visible:ring-brand-teal min-h-11 rounded-xl px-5 font-bold text-white outline-none focus-visible:ring-4"
+          (click)="confirmStatusChange()"
+        >
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </dialog>
+</div>

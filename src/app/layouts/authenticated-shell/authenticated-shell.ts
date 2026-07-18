@@ -11,6 +11,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'app-authenticated-shell',
@@ -33,6 +34,7 @@ export class AuthenticatedShell {
   readonly isDesktop = signal(this.desktopMediaQuery?.matches ?? false);
   readonly formattedDate = this.formatCurrentDate();
   readonly todayIso = this.formatIsoDate(new Date());
+  readonly pageTitle = signal(this.resolvePageTitle(this.router.url));
 
   constructor() {
     const handleBreakpointChange = (event: MediaQueryListEvent): void => {
@@ -46,6 +48,13 @@ export class AuthenticatedShell {
     this.destroyRef.onDestroy(() => {
       this.desktopMediaQuery?.removeEventListener('change', handleBreakpointChange);
     });
+
+    const routerSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.pageTitle.set(this.resolvePageTitle(event.urlAfterRedirects));
+      }
+    });
+    this.destroyRef.onDestroy(() => routerSubscription.unsubscribe());
 
     effect((onCleanup) => {
       if (!this.menuOpen() || this.isDesktop()) {
@@ -99,6 +108,10 @@ export class AuthenticatedShell {
     }).format(new Date());
 
     return `${formatted.charAt(0).toUpperCase()}${formatted.slice(1)}`;
+  }
+
+  private resolvePageTitle(url: string): string {
+    return url.startsWith('/clientes') ? 'Clientes' : 'Inicio';
   }
 
   private formatIsoDate(date: Date): string {

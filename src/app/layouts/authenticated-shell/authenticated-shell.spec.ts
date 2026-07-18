@@ -41,9 +41,10 @@ describe('AuthenticatedShell', () => {
     const links = navigation?.querySelectorAll('a');
     const disabledItems = navigation?.querySelectorAll('[aria-disabled="true"]');
 
-    expect(links).toHaveLength(1);
+    expect(links).toHaveLength(2);
     expect(links?.[0].getAttribute('href')).toBe('/dashboard');
-    expect(disabledItems).toHaveLength(6);
+    expect(links?.[1].getAttribute('href')).toBe('/clientes');
+    expect(disabledItems).toHaveLength(5);
   });
 
   it('should open the mobile menu and lock document scrolling', () => {

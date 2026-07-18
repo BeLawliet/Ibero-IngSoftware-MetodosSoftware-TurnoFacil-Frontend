@@ -41,12 +41,15 @@ describe('AuthenticatedShell', () => {
     const links = navigation?.querySelectorAll('a');
     const disabledItems = navigation?.querySelectorAll('[aria-disabled="true"]');
 
-    expect(links).toHaveLength(4);
+    expect(links).toHaveLength(6);
     expect(links?.[0].getAttribute('href')).toBe('/dashboard');
-    expect(links?.[1].getAttribute('href')).toBe('/clientes');
-    expect(links?.[2].getAttribute('href')).toBe('/empleados');
-    expect(links?.[3].getAttribute('href')).toBe('/servicios');
-    expect(disabledItems).toHaveLength(3);
+    expect(links?.[1].getAttribute('href')).toBe('/agenda');
+    expect(links?.[2].getAttribute('href')).toBe('/citas');
+    expect(links?.[3].getAttribute('href')).toBe('/clientes');
+    expect(links?.[4].getAttribute('href')).toBe('/empleados');
+    expect(links?.[5].getAttribute('href')).toBe('/servicios');
+    expect(disabledItems).toHaveLength(0);
+    expect(navigation?.textContent).not.toContain('Configuración');
   });
 
   it('should open the mobile menu and lock document scrolling', () => {

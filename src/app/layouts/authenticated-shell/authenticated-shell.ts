@@ -110,6 +110,12 @@ export class AuthenticatedShell {
   }
 
   private resolvePageTitle(url: string): string {
+    if (url.startsWith('/agenda')) {
+      return 'Agenda';
+    }
+    if (url.startsWith('/citas')) {
+      return 'Citas';
+    }
     if (url.startsWith('/clientes')) {
       return 'Clientes';
     }

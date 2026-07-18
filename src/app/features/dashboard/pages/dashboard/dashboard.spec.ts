@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { AppointmentsStore } from '../../../appointments/data/appointments.store';
 import { DashboardPage } from './dashboard';
 
 describe('DashboardPage', () => {
@@ -8,6 +10,7 @@ describe('DashboardPage', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [DashboardPage],
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardPage);
@@ -30,14 +33,11 @@ describe('DashboardPage', () => {
     const text = element.textContent;
 
     expect(metrics).toHaveLength(4);
-    expect(text).toContain('Citas programadas');
-    expect(text).toContain('18');
-    expect(text).toContain('Empleados activos');
-    expect(text).toContain('12');
-    expect(text).toContain('Citas atendidas');
-    expect(text).toContain('7');
-    expect(text).toContain('Citas canceladas');
-    expect(text).toContain('2');
+    expect(metricValue(element, 'Citas programadas')).toBe('5');
+    expect(metricValue(element, 'Empleados activos')).toBe('12');
+    expect(metricValue(element, 'Citas atendidas')).toBe('2');
+    expect(metricValue(element, 'Citas canceladas')).toBe('2');
+    expect(text).toContain('Registradas en el historial');
   });
 
   it('should render all agenda data and accessible statuses', () => {
@@ -46,11 +46,11 @@ describe('DashboardPage', () => {
     const text = element.textContent;
 
     expect(desktopRows).toHaveLength(5);
-    expect(text).toContain('Laura Gómez');
-    expect(text).toContain('Carlos Ruiz');
-    expect(text).toContain('Sofía Martínez');
-    expect(text).toContain('Miguel Sánchez');
-    expect(text).toContain('Valentina Rojas');
+    expect(text).toContain('Lucía Mendoza');
+    expect(text).toContain('Mateo Castro');
+    expect(text).toContain('Valeria Ríos');
+    expect(text).toContain('Tomás Herrera');
+    expect(text).toContain('Isabella Navas');
     expect(text).toContain('Programada');
     expect(text).toContain('En atención');
     expect(text).toContain('Atendida');
@@ -67,20 +67,37 @@ describe('DashboardPage', () => {
     expect(text).toContain('Disponible');
     expect(text).toContain('Ocupado');
     expect(text).toContain('Fuera de turno');
-    expect(text).toContain('Andrea Moreno');
-    expect(text).toContain('Julián Pérez');
+    const upcomingSection = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('section'),
+    ).find((section) => section.textContent?.includes('Próximos turnos'));
+    expect(upcomingSection?.querySelectorAll('li')).toHaveLength(3);
   });
 
-  it('should keep the new appointment action local', () => {
+  it('should react to changes in the shared appointment store', () => {
+    const store = TestBed.inject(AppointmentsStore);
     const element = fixture.nativeElement as HTMLElement;
 
-    Array.from(element.querySelectorAll<HTMLButtonElement>('button'))
-      .find((button) => button.textContent?.includes('Nueva cita'))
-      ?.click();
+    store.changeStatus(1, 'Cancelada');
     fixture.detectChanges();
 
-    expect(element.querySelector('[aria-live="polite"]')?.textContent).toContain(
-      'La creación de citas estará disponible próximamente.',
+    expect(metricValue(element, 'Citas programadas')).toBe('4');
+    expect(metricValue(element, 'Citas canceladas')).toBe('3');
+    expect(element.textContent).toContain('Lucía Mendoza');
+  });
+
+  it('should link the new appointment action to the appointments form', () => {
+    const element = fixture.nativeElement as HTMLElement;
+    const link = Array.from(element.querySelectorAll<HTMLAnchorElement>('a')).find((anchor) =>
+      anchor.textContent?.includes('Nueva cita'),
     );
+
+    expect(link?.getAttribute('href')).toBe('/citas?nueva=true');
   });
 });
+
+function metricValue(element: HTMLElement, label: string): string | undefined {
+  const article = Array.from(
+    element.querySelectorAll<HTMLElement>('[aria-label="Métricas del día"] article'),
+  ).find((item) => item.textContent?.includes(label));
+  return article?.querySelectorAll('p').item(1).textContent?.trim();
+}

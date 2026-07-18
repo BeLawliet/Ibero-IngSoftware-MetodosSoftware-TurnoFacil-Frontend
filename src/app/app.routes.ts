@@ -26,6 +26,18 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'agenda',
+        loadComponent: () =>
+          import('./features/agenda/pages/agenda/agenda').then(({ AgendaPage }) => AgendaPage),
+      },
+      {
+        path: 'citas',
+        loadComponent: () =>
+          import('./features/appointments/pages/appointments/appointments').then(
+            ({ AppointmentsPage }) => AppointmentsPage,
+          ),
+      },
+      {
         path: 'clientes',
         loadComponent: () =>
           import('./features/clients/pages/clients/clients').then(({ ClientsPage }) => ClientsPage),

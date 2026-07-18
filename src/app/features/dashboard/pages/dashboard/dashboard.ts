@@ -1,7 +1,12 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import {
+  AppointmentStatus,
+  AppointmentsStore,
+} from '../../../appointments/data/appointments.store';
+import { toLocalIsoDate } from '../../../../shared/utils/date.utils';
 
 type MetricIcon = 'calendar' | 'team' | 'completed' | 'cancelled';
-type AppointmentStatus = 'Programada' | 'En atención' | 'Atendida' | 'Cancelada';
 type AvailabilityStatus = 'Disponible' | 'Ocupado' | 'Fuera de turno';
 
 interface SummaryMetric {
@@ -12,14 +17,6 @@ interface SummaryMetric {
   readonly iconClass: string;
 }
 
-interface Appointment {
-  readonly time: string;
-  readonly client: string;
-  readonly service: string;
-  readonly employee: string;
-  readonly status: AppointmentStatus;
-}
-
 interface TeamMember {
   readonly name: string;
   readonly initials: string;
@@ -28,89 +25,57 @@ interface TeamMember {
   readonly nextAvailability?: string;
 }
 
-interface UpcomingAppointment {
-  readonly time: string;
-  readonly client: string;
-  readonly service: string;
-}
-
 @Component({
   selector: 'app-dashboard-page',
+  imports: [RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardPage {
-  protected readonly announcement = signal('');
+  private readonly appointmentsStore = inject(AppointmentsStore);
+  private readonly todayIso = toLocalIsoDate(new Date());
 
-  protected readonly metrics = [
-    {
-      label: 'Citas programadas',
-      value: 18,
-      detail: '4 en las próximas 2 horas',
-      icon: 'calendar',
-      iconClass: 'bg-brand-teal-soft text-brand-teal',
-    },
-    {
-      label: 'Empleados activos',
-      value: 12,
-      detail: 'De 15 empleados registrados',
-      icon: 'team',
-      iconClass: 'bg-blue-50 text-blue-600',
-    },
-    {
-      label: 'Citas atendidas',
-      value: 7,
-      detail: 'Durante la jornada de hoy',
-      icon: 'completed',
-      iconClass: 'bg-emerald-50 text-emerald-600',
-    },
-    {
-      label: 'Citas canceladas',
-      value: 2,
-      detail: 'Durante la jornada de hoy',
-      icon: 'cancelled',
-      iconClass: 'bg-rose-50 text-rose-600',
-    },
-  ] as const satisfies readonly SummaryMetric[];
+  protected readonly metrics = computed<readonly SummaryMetric[]>(() => {
+    const appointments = this.appointmentsStore.appointments();
+    return [
+      {
+        label: 'Citas programadas',
+        value: appointments.filter((appointment) => appointment.status === 'Programada').length,
+        detail: `${appointments.filter((appointment) => appointment.status === 'Programada' && appointment.date === this.todayIso).length} para hoy`,
+        icon: 'calendar',
+        iconClass: 'bg-brand-teal-soft text-brand-teal',
+      },
+      {
+        label: 'Empleados activos',
+        value: 12,
+        detail: 'De 15 empleados registrados',
+        icon: 'team',
+        iconClass: 'bg-blue-50 text-blue-600',
+      },
+      {
+        label: 'Citas atendidas',
+        value: appointments.filter((appointment) => appointment.status === 'Atendida').length,
+        detail: 'Registradas en el historial',
+        icon: 'completed',
+        iconClass: 'bg-emerald-50 text-emerald-600',
+      },
+      {
+        label: 'Citas canceladas',
+        value: appointments.filter((appointment) => appointment.status === 'Cancelada').length,
+        detail: 'Registradas en el historial',
+        icon: 'cancelled',
+        iconClass: 'bg-rose-50 text-rose-600',
+      },
+    ];
+  });
 
-  protected readonly appointments = [
-    {
-      time: '09:00',
-      client: 'Laura Gómez',
-      service: 'Corte y peinado',
-      employee: 'Mariana López',
-      status: 'En atención',
-    },
-    {
-      time: '10:00',
-      client: 'Carlos Ruiz',
-      service: 'Consulta',
-      employee: 'Andrés Vega',
-      status: 'Programada',
-    },
-    {
-      time: '11:30',
-      client: 'Sofía Martínez',
-      service: 'Manicura',
-      employee: 'Daniela Torres',
-      status: 'Programada',
-    },
-    {
-      time: '13:00',
-      client: 'Miguel Sánchez',
-      service: 'Barbería',
-      employee: 'Andrés Vega',
-      status: 'Atendida',
-    },
-    {
-      time: '14:30',
-      client: 'Valentina Rojas',
-      service: 'Coloración',
-      employee: 'Mariana López',
-      status: 'Cancelada',
-    },
-  ] as const satisfies readonly Appointment[];
+  protected readonly appointments = computed(() =>
+    this.appointmentsStore
+      .appointments()
+      .filter((appointment) => appointment.date === this.todayIso)
+      .sort((first, second) => first.startTime.localeCompare(second.startTime)),
+  );
 
   protected readonly team = [
     {
@@ -143,11 +108,25 @@ export class DashboardPage {
     },
   ] as const satisfies readonly TeamMember[];
 
-  protected readonly upcomingAppointments = [
-    { time: '10:00', client: 'Carlos Ruiz', service: 'Consulta' },
-    { time: '10:30', client: 'Andrea Moreno', service: 'Corte' },
-    { time: '11:00', client: 'Julián Pérez', service: 'Barbería' },
-  ] as const satisfies readonly UpcomingAppointment[];
+  protected readonly upcomingAppointments = computed(() => {
+    const now = new Date();
+    const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now
+      .getMinutes()
+      .toString()
+      .padStart(2, '0')}`;
+    const currentDateTime = `${this.todayIso}T${currentTime}`;
+    return this.appointmentsStore
+      .appointments()
+      .filter(
+        (appointment) =>
+          appointment.status !== 'Cancelada' &&
+          `${appointment.date}T${appointment.startTime}` >= currentDateTime,
+      )
+      .sort((first, second) =>
+        `${first.date}T${first.startTime}`.localeCompare(`${second.date}T${second.startTime}`),
+      )
+      .slice(0, 3);
+  });
 
   protected readonly appointmentStatusClasses: Readonly<Record<AppointmentStatus, string>> = {
     Programada: 'bg-blue-50 text-blue-700 ring-blue-600/15',
@@ -161,8 +140,4 @@ export class DashboardPage {
     Ocupado: 'bg-amber-500',
     'Fuera de turno': 'bg-slate-400',
   };
-
-  protected announceNewAppointment(): void {
-    this.announcement.set('La creación de citas estará disponible próximamente.');
-  }
 }

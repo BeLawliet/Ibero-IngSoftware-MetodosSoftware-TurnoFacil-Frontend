@@ -86,9 +86,13 @@
           </a>
         </li>
         <li>
-          <span
-            class="flex min-h-12 items-center gap-3 rounded-xl px-4 text-white/55"
-            aria-disabled="true"
+          <a
+            routerLink="/agenda"
+            routerLinkActive="bg-brand-teal text-white shadow-sm"
+            [routerLinkActiveOptions]="{ exact: true }"
+            ariaCurrentWhenActive="page"
+            class="focus-visible:ring-brand-teal flex min-h-12 items-center gap-3 rounded-xl px-4 font-semibold text-white/75 outline-none transition hover:bg-white/10 hover:text-white focus-visible:ring-2"
+            (click)="closeMenu(false)"
           >
             <svg
               viewBox="0 0 24 24"
@@ -102,12 +106,16 @@
               <path d="M7 3v4M17 3v4M3.5 9.5h17"></path>
             </svg>
             Agenda
-          </span>
+          </a>
         </li>
         <li>
-          <span
-            class="flex min-h-12 items-center gap-3 rounded-xl px-4 text-white/55"
-            aria-disabled="true"
+          <a
+            routerLink="/citas"
+            routerLinkActive="bg-brand-teal text-white shadow-sm"
+            [routerLinkActiveOptions]="{ exact: true }"
+            ariaCurrentWhenActive="page"
+            class="focus-visible:ring-brand-teal flex min-h-12 items-center gap-3 rounded-xl px-4 font-semibold text-white/75 outline-none transition hover:bg-white/10 hover:text-white focus-visible:ring-2"
+            (click)="closeMenu(false)"
           >
             <svg
               viewBox="0 0 24 24"
@@ -121,7 +129,7 @@
               <path d="M12 7.5v5l3.5 2"></path>
             </svg>
             Citas
-          </span>
+          </a>
         </li>
         <li>
           <a
@@ -191,27 +199,6 @@
             </svg>
             Servicios
           </a>
-        </li>
-        <li>
-          <span
-            class="flex min-h-12 items-center gap-3 rounded-xl px-4 text-white/55"
-            aria-disabled="true"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              class="size-5"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="3"></circle>
-              <path
-                d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"
-              ></path>
-            </svg>
-            Configuración
-          </span>
         </li>
       </ul>
     </nav>

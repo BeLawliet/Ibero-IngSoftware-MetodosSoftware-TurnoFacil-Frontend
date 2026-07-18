@@ -1,0 +1,735 @@
+<div class="min-w-0 p-4 sm:p-6 lg:p-8">
+  <header class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-extrabold tracking-[-0.035em] text-brand-text sm:text-3xl">Citas</h1>
+      <p class="text-brand-muted mt-2">
+        Administra las citas programadas y realiza seguimiento a su estado.
+      </p>
+    </div>
+    <button
+      type="button"
+      class="bg-brand-teal hover:bg-brand-teal-hover focus-visible:ring-brand-teal inline-flex min-h-12 items-center justify-center gap-2 self-start rounded-xl px-5 font-bold text-white shadow-sm outline-none transition focus-visible:ring-4 focus-visible:ring-offset-2 sm:self-auto"
+      (click)="openCreateDialog()"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        class="size-5"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <path d="M12 5v14M5 12h14"></path>
+      </svg>
+      Nueva cita
+    </button>
+  </header>
+
+  @if (confirmationMessage()) {
+    <div
+      class="mt-5 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800"
+      role="status"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        class="size-5 shrink-0"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="m7.5 12 3 3 6-7"></path>
+      </svg>
+      {{ confirmationMessage() }}
+    </div>
+  }
+
+  <section class="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Resumen de citas">
+    <article
+      class="border-brand-border flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm"
+    >
+      <span
+        class="bg-brand-teal-soft text-brand-teal grid size-11 shrink-0 place-items-center rounded-xl"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="size-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <rect x="4" y="5.5" width="16" height="14" rx="2"></rect>
+          <path d="M8 3.5v4M16 3.5v4M4 10h16"></path>
+        </svg>
+      </span>
+      <div>
+        <p class="text-brand-muted text-sm font-semibold">Citas de hoy</p>
+        <p class="mt-1 text-2xl font-extrabold text-brand-text">{{ summary().today }}</p>
+      </div>
+    </article>
+    <article
+      class="border-brand-border flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm"
+    >
+      <span
+        class="grid size-11 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="size-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <circle cx="12" cy="12" r="8.5"></circle>
+          <path d="M12 7.5v5l3.5 2"></path>
+        </svg>
+      </span>
+      <div>
+        <p class="text-brand-muted text-sm font-semibold">Programadas</p>
+        <p class="mt-1 text-2xl font-extrabold text-brand-text">{{ summary().scheduled }}</p>
+      </div>
+    </article>
+    <article
+      class="border-brand-border flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm"
+    >
+      <span
+        class="grid size-11 shrink-0 place-items-center rounded-xl bg-amber-50 text-amber-600"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="size-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <path d="M8 5.5v13l10-6.5Z"></path>
+        </svg>
+      </span>
+      <div>
+        <p class="text-brand-muted text-sm font-semibold">En atención</p>
+        <p class="mt-1 text-2xl font-extrabold text-brand-text">{{ summary().inProgress }}</p>
+      </div>
+    </article>
+    <article
+      class="border-brand-border flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm"
+    >
+      <span
+        class="grid size-11 shrink-0 place-items-center rounded-xl bg-rose-50 text-rose-600"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="size-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <circle cx="12" cy="12" r="8.5"></circle>
+          <path d="m8.5 8.5 7 7M15.5 8.5l-7 7"></path>
+        </svg>
+      </span>
+      <div>
+        <p class="text-brand-muted text-sm font-semibold">Canceladas</p>
+        <p class="mt-1 text-2xl font-extrabold text-brand-text">{{ summary().cancelled }}</p>
+      </div>
+    </article>
+  </section>
+
+  <section
+    class="border-brand-border mt-6 rounded-2xl border bg-white p-4 shadow-sm sm:p-5"
+    aria-label="Búsqueda y filtros de citas"
+  >
+    <div
+      class="grid gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(14rem,1fr)_11rem_13rem_11rem_auto] xl:items-end"
+    >
+      <div class="min-w-0 sm:col-span-2 xl:col-span-1">
+        <label for="appointment-search" class="mb-2 block text-sm font-bold text-slate-700">
+          Buscar citas
+        </label>
+        <div class="relative">
+          <svg
+            viewBox="0 0 24 24"
+            class="text-brand-muted pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+          >
+            <circle cx="10.5" cy="10.5" r="6.5"></circle>
+            <path d="m15.5 15.5 5 5"></path>
+          </svg>
+          <input
+            id="appointment-search"
+            type="search"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border bg-slate-50 pr-4 pl-12 text-sm outline-none transition focus:ring-4"
+            placeholder="Cliente, servicio o empleado"
+            [value]="searchTerm()"
+            (input)="updateSearch($event)"
+          />
+        </div>
+      </div>
+      <div>
+        <label for="appointment-status-filter" class="mb-2 block text-sm font-bold text-slate-700">
+          Estado
+        </label>
+        <select
+          id="appointment-status-filter"
+          class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border bg-slate-50 px-4 text-sm outline-none transition focus:ring-4"
+          [value]="statusFilter()"
+          (change)="updateStatusFilter($event)"
+        >
+          <option>Todos</option>
+          <option>Programada</option>
+          <option>En atención</option>
+          <option>Atendida</option>
+          <option>Cancelada</option>
+        </select>
+      </div>
+      <div>
+        <label
+          for="appointment-employee-filter"
+          class="mb-2 block text-sm font-bold text-slate-700"
+        >
+          Empleado
+        </label>
+        <select
+          id="appointment-employee-filter"
+          class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border bg-slate-50 px-4 text-sm outline-none transition focus:ring-4"
+          [value]="employeeFilter()"
+          (change)="updateEmployeeFilter($event)"
+        >
+          <option value="Todos">Todos</option>
+          @for (employee of employees; track employee.id) {
+            <option [value]="employee.id">{{ employee.name }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label for="appointment-date-filter" class="mb-2 block text-sm font-bold text-slate-700">
+          Fecha
+        </label>
+        <select
+          id="appointment-date-filter"
+          class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border bg-slate-50 px-4 text-sm outline-none transition focus:ring-4"
+          [value]="dateFilter()"
+          (change)="updateDateFilter($event)"
+        >
+          <option>Todas</option>
+          <option>Hoy</option>
+          <option>Mañana</option>
+          <option>Esta semana</option>
+        </select>
+      </div>
+      @if (hasFilters()) {
+        <button
+          type="button"
+          class="border-brand-border hover:bg-slate-50 focus-visible:ring-brand-teal h-12 rounded-xl border px-4 text-sm font-bold text-slate-700 outline-none focus-visible:ring-2"
+          (click)="clearFilters()"
+        >
+          Limpiar filtros
+        </button>
+      }
+    </div>
+    <p class="text-brand-muted mt-3 text-sm" aria-live="polite">
+      {{ filteredAppointments().length }} citas encontradas
+    </p>
+  </section>
+
+  <section
+    class="border-brand-border mt-6 min-w-0 rounded-2xl border bg-white shadow-sm"
+    aria-labelledby="appointments-list-title"
+  >
+    <div class="border-brand-border border-b px-5 py-5 sm:px-6">
+      <h2 id="appointments-list-title" class="text-lg font-bold text-brand-text">
+        Citas registradas
+      </h2>
+    </div>
+
+    @if (filteredAppointments().length === 0) {
+      <div class="px-6 py-14 text-center">
+        <p class="font-bold text-brand-text">No se encontraron citas</p>
+        <p class="text-brand-muted mt-2 text-sm">Prueba con otros criterios de búsqueda.</p>
+      </div>
+    } @else {
+      <div class="hidden lg:block">
+        <table class="w-full table-fixed border-collapse text-left">
+          <thead class="bg-slate-50 text-xs tracking-wide text-slate-500 uppercase">
+            <tr>
+              <th scope="col" class="w-[17%] px-5 py-3 font-semibold">Fecha y hora</th>
+              <th scope="col" class="w-[16%] px-3 py-3 font-semibold">Cliente</th>
+              <th scope="col" class="w-[17%] px-3 py-3 font-semibold">Servicio</th>
+              <th scope="col" class="w-[17%] px-3 py-3 font-semibold">Empleado</th>
+              <th scope="col" class="w-[10%] px-3 py-3 font-semibold">Duración</th>
+              <th scope="col" class="w-[13%] px-3 py-3 font-semibold">Estado</th>
+              <th scope="col" class="w-[10%] px-3 py-3 text-right font-semibold">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-brand-border divide-y">
+            @for (appointment of filteredAppointments(); track appointment.id) {
+              <tr class="text-sm">
+                <td class="px-5 py-4">
+                  <p class="font-bold text-brand-text">{{ formatDate(appointment.date) }}</p>
+                  <p class="text-brand-muted mt-1 text-xs">
+                    {{ appointment.startTime }} - {{ appointment.endTime }}
+                  </p>
+                </td>
+                <td class="truncate px-3 py-4 font-semibold text-slate-700">
+                  {{ appointment.clientName }}
+                </td>
+                <td class="text-brand-muted truncate px-3 py-4">{{ appointment.serviceName }}</td>
+                <td class="text-brand-muted truncate px-3 py-4">{{ appointment.employeeName }}</td>
+                <td class="text-brand-muted px-3 py-4">
+                  {{ formatDuration(appointment.durationMinutes) }}
+                </td>
+                <td class="px-3 py-4">
+                  <span
+                    class="inline-flex rounded-full px-2.5 py-1 text-xs font-bold ring-1 ring-inset"
+                    [class]="statusClass(appointment.status)"
+                  >
+                    {{ appointment.status }}
+                  </span>
+                </td>
+                <td class="relative px-3 py-4 text-right">
+                  <button
+                    type="button"
+                    class="hover:bg-slate-100 focus-visible:ring-brand-teal inline-grid size-10 place-items-center rounded-lg text-slate-600 outline-none focus-visible:ring-2"
+                    [attr.aria-label]="'Acciones para la cita de ' + appointment.clientName"
+                    [attr.aria-expanded]="actionsAppointmentId() === appointment.id"
+                    (click)="toggleActions(appointment.id)"
+                  >
+                    <svg viewBox="0 0 24 24" class="size-5" fill="currentColor" aria-hidden="true">
+                      <circle cx="5" cy="12" r="1.7"></circle>
+                      <circle cx="12" cy="12" r="1.7"></circle>
+                      <circle cx="19" cy="12" r="1.7"></circle>
+                    </svg>
+                  </button>
+                  @if (actionsAppointmentId() === appointment.id) {
+                    <div
+                      class="border-brand-border absolute top-13 right-3 z-20 w-52 rounded-xl border bg-white p-1.5 text-left shadow-lg"
+                      role="menu"
+                    >
+                      @if (appointment.status === 'Cancelada') {
+                        <p class="text-brand-muted px-3 py-2 text-xs">Sin acciones disponibles</p>
+                      } @else {
+                        <button
+                          type="button"
+                          role="menuitem"
+                          class="hover:bg-slate-50 focus-visible:bg-slate-50 w-full rounded-lg px-3 py-2 text-left text-sm font-semibold outline-none"
+                          (click)="openEditDialog(appointment)"
+                        >
+                          Editar
+                        </button>
+                        @if (appointment.status === 'Programada') {
+                          <button
+                            type="button"
+                            role="menuitem"
+                            class="hover:bg-slate-50 focus-visible:bg-slate-50 w-full rounded-lg px-3 py-2 text-left text-sm font-semibold outline-none"
+                            (click)="changeStatus(appointment, 'En atención')"
+                          >
+                            Marcar como En atención
+                          </button>
+                        }
+                        @if (appointment.status === 'En atención') {
+                          <button
+                            type="button"
+                            role="menuitem"
+                            class="hover:bg-slate-50 focus-visible:bg-slate-50 w-full rounded-lg px-3 py-2 text-left text-sm font-semibold outline-none"
+                            (click)="changeStatus(appointment, 'Atendida')"
+                          >
+                            Marcar como Atendida
+                          </button>
+                        }
+                        @if (canCancel(appointment)) {
+                          <button
+                            type="button"
+                            role="menuitem"
+                            class="hover:bg-rose-50 focus-visible:bg-rose-50 w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-rose-700 outline-none"
+                            (click)="requestCancellation(appointment)"
+                          >
+                            Cancelar cita
+                          </button>
+                        }
+                      }
+                    </div>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <ul class="divide-brand-border divide-y lg:hidden">
+        @for (appointment of filteredAppointments(); track appointment.id) {
+          <li class="p-5">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <p class="font-bold text-brand-text">{{ formatDate(appointment.date) }}</p>
+                <p class="text-brand-teal mt-1 text-sm font-extrabold">
+                  {{ appointment.startTime }} - {{ appointment.endTime }}
+                </p>
+              </div>
+              <span
+                class="inline-flex shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ring-1 ring-inset"
+                [class]="statusClass(appointment.status)"
+              >
+                {{ appointment.status }}
+              </span>
+            </div>
+            <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+              <div>
+                <dt class="text-brand-muted text-xs">Cliente</dt>
+                <dd class="mt-1 font-semibold text-slate-700">{{ appointment.clientName }}</dd>
+              </div>
+              <div>
+                <dt class="text-brand-muted text-xs">Servicio</dt>
+                <dd class="mt-1 font-semibold text-slate-700">{{ appointment.serviceName }}</dd>
+              </div>
+              <div>
+                <dt class="text-brand-muted text-xs">Empleado</dt>
+                <dd class="mt-1 font-semibold text-slate-700">{{ appointment.employeeName }}</dd>
+              </div>
+              <div>
+                <dt class="text-brand-muted text-xs">Duración</dt>
+                <dd class="mt-1 font-semibold text-slate-700">
+                  {{ formatDuration(appointment.durationMinutes) }}
+                </dd>
+              </div>
+            </dl>
+            @if (appointment.status !== 'Cancelada') {
+              <div class="mt-4 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  class="border-brand-border focus-visible:ring-brand-teal rounded-lg border px-3 py-2 text-sm font-bold outline-none focus-visible:ring-2"
+                  [attr.aria-label]="'Editar cita de ' + appointment.clientName"
+                  (click)="openEditDialog(appointment)"
+                >
+                  Editar
+                </button>
+                @if (appointment.status === 'Programada') {
+                  <button
+                    type="button"
+                    class="border-brand-border focus-visible:ring-brand-teal rounded-lg border px-3 py-2 text-sm font-bold outline-none focus-visible:ring-2"
+                    (click)="changeStatus(appointment, 'En atención')"
+                  >
+                    En atención
+                  </button>
+                }
+                @if (appointment.status === 'En atención') {
+                  <button
+                    type="button"
+                    class="border-brand-border focus-visible:ring-brand-teal rounded-lg border px-3 py-2 text-sm font-bold outline-none focus-visible:ring-2"
+                    (click)="changeStatus(appointment, 'Atendida')"
+                  >
+                    Atendida
+                  </button>
+                }
+                @if (canCancel(appointment)) {
+                  <button
+                    type="button"
+                    class="border-rose-200 text-rose-700 focus-visible:ring-rose-500 rounded-lg border px-3 py-2 text-sm font-bold outline-none focus-visible:ring-2"
+                    (click)="requestCancellation(appointment)"
+                  >
+                    Cancelar
+                  </button>
+                }
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <dialog
+    #appointmentDialog
+    class="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-2xl bg-white p-0 shadow-2xl"
+    aria-labelledby="appointment-dialog-title"
+    (cancel)="handleAppointmentDialogCancel($event)"
+    (click)="closeFromBackdrop($event, appointmentDialog)"
+  >
+    <div class="border-brand-border flex items-center justify-between border-b px-5 py-4 sm:px-6">
+      <div>
+        <h2 id="appointment-dialog-title" class="text-xl font-extrabold text-brand-text">
+          {{ formMode() === 'create' ? 'Nueva cita' : 'Editar cita' }}
+        </h2>
+        <p class="text-brand-muted mt-1 text-sm">Completa la información de la cita.</p>
+      </div>
+      <button
+        type="button"
+        class="hover:bg-slate-100 focus-visible:ring-brand-teal grid size-10 place-items-center rounded-lg outline-none focus-visible:ring-2"
+        aria-label="Cerrar formulario de cita"
+        (click)="closeAppointmentDialog()"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="size-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path d="m6 6 12 12M18 6 6 18"></path>
+        </svg>
+      </button>
+    </div>
+    <form
+      class="p-5 sm:p-6"
+      [formGroup]="appointmentForm"
+      (ngSubmit)="saveAppointment()"
+      novalidate
+    >
+      @if (conflictMessage()) {
+        <div
+          class="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700"
+          role="alert"
+        >
+          {{ conflictMessage() }}
+        </div>
+      }
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="appointment-client" class="mb-2 block text-sm font-bold text-slate-700">
+            Cliente
+          </label>
+          <select
+            id="appointment-client"
+            formControlName="clientId"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border px-4 outline-none focus:ring-4"
+            [class.border-brand-error]="showError('clientId')"
+            [attr.aria-invalid]="showError('clientId')"
+            [attr.aria-describedby]="showError('clientId') ? 'appointment-client-error' : null"
+          >
+            <option value="">Selecciona un cliente</option>
+            @for (client of clients; track client.id) {
+              <option [value]="client.id">{{ client.name }}</option>
+            }
+          </select>
+          @if (showError('clientId')) {
+            <p id="appointment-client-error" class="text-brand-error mt-2 text-sm" role="alert">
+              El cliente es obligatorio.
+            </p>
+          }
+        </div>
+        <div>
+          <label for="appointment-service" class="mb-2 block text-sm font-bold text-slate-700">
+            Servicio
+          </label>
+          <select
+            id="appointment-service"
+            formControlName="serviceId"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border px-4 outline-none focus:ring-4"
+            [class.border-brand-error]="showError('serviceId')"
+            [attr.aria-invalid]="showError('serviceId')"
+            [attr.aria-describedby]="showError('serviceId') ? 'appointment-service-error' : null"
+            (change)="updateServicePreview($event)"
+          >
+            <option value="">Selecciona un servicio</option>
+            @for (service of services; track service.id) {
+              <option [value]="service.id">
+                {{ service.name }} · {{ formatDuration(service.durationMinutes) }}
+              </option>
+            }
+          </select>
+          @if (showError('serviceId')) {
+            <p id="appointment-service-error" class="text-brand-error mt-2 text-sm" role="alert">
+              El servicio es obligatorio.
+            </p>
+          }
+        </div>
+        <div>
+          <label for="appointment-employee" class="mb-2 block text-sm font-bold text-slate-700">
+            Empleado
+          </label>
+          <select
+            id="appointment-employee"
+            formControlName="employeeId"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border px-4 outline-none focus:ring-4"
+            [class.border-brand-error]="showError('employeeId')"
+            [attr.aria-invalid]="showError('employeeId')"
+            [attr.aria-describedby]="showError('employeeId') ? 'appointment-employee-error' : null"
+          >
+            <option value="">Selecciona un empleado</option>
+            @for (employee of employees; track employee.id) {
+              <option [value]="employee.id">{{ employee.name }}</option>
+            }
+          </select>
+          @if (showError('employeeId')) {
+            <p id="appointment-employee-error" class="text-brand-error mt-2 text-sm" role="alert">
+              El empleado es obligatorio.
+            </p>
+          }
+        </div>
+        <div>
+          <label for="appointment-status" class="mb-2 block text-sm font-bold text-slate-700">
+            Estado
+          </label>
+          <select
+            id="appointment-status"
+            formControlName="status"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border px-4 outline-none focus:ring-4"
+            [class.border-brand-error]="showError('status')"
+            [attr.aria-invalid]="showError('status')"
+            [attr.aria-describedby]="showError('status') ? 'appointment-status-error' : null"
+          >
+            @for (status of editableStatuses; track status) {
+              <option [value]="status">{{ status }}</option>
+            }
+          </select>
+          @if (showError('status')) {
+            <p id="appointment-status-error" class="text-brand-error mt-2 text-sm" role="alert">
+              El estado es obligatorio.
+            </p>
+          }
+        </div>
+        <div>
+          <label for="appointment-date" class="mb-2 block text-sm font-bold text-slate-700">
+            Fecha
+          </label>
+          <input
+            id="appointment-date"
+            type="date"
+            formControlName="date"
+            [attr.min]="formMode() === 'create' ? todayIso : null"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border px-4 outline-none focus:ring-4"
+            [class.border-brand-error]="showError('date') || pastDateError()"
+            [attr.aria-invalid]="showError('date') || pastDateError()"
+            [attr.aria-describedby]="
+              showError('date')
+                ? 'appointment-date-error'
+                : pastDateError()
+                  ? 'appointment-past-date-error'
+                  : null
+            "
+          />
+          @if (showError('date')) {
+            <p id="appointment-date-error" class="text-brand-error mt-2 text-sm" role="alert">
+              La fecha es obligatoria.
+            </p>
+          } @else if (pastDateError()) {
+            <p id="appointment-past-date-error" class="text-brand-error mt-2 text-sm" role="alert">
+              La fecha no puede ser anterior al día de hoy.
+            </p>
+          }
+        </div>
+        <div>
+          <label for="appointment-time" class="mb-2 block text-sm font-bold text-slate-700">
+            Hora de inicio
+          </label>
+          <input
+            id="appointment-time"
+            type="time"
+            formControlName="startTime"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border px-4 outline-none focus:ring-4"
+            [class.border-brand-error]="showError('startTime')"
+            [attr.aria-invalid]="showError('startTime')"
+            [attr.aria-describedby]="showError('startTime') ? 'appointment-time-error' : null"
+            (input)="updateTimePreview($event)"
+          />
+          @if (showError('startTime')) {
+            <p id="appointment-time-error" class="text-brand-error mt-2 text-sm" role="alert">
+              La hora de inicio es obligatoria.
+            </p>
+          }
+        </div>
+      </div>
+
+      @if (previewDuration() > 0) {
+        <div
+          class="bg-brand-teal-soft mt-5 rounded-xl px-4 py-3 text-sm text-teal-800"
+          aria-live="polite"
+        >
+          <strong>Duración:</strong> {{ formatDuration(previewDuration()) }}
+          @if (estimatedEndTime()) {
+            <span class="mx-2" aria-hidden="true">·</span>
+            <strong>Finaliza aproximadamente a las {{ estimatedEndTime() }}</strong>
+          }
+        </div>
+      }
+
+      <div class="mt-5">
+        <label for="appointment-notes" class="mb-2 block text-sm font-bold text-slate-700">
+          Observaciones <span class="text-brand-muted font-normal">(opcional)</span>
+        </label>
+        <textarea
+          id="appointment-notes"
+          formControlName="notes"
+          rows="3"
+          class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 w-full resize-y rounded-xl border px-4 py-3 outline-none focus:ring-4"
+        ></textarea>
+      </div>
+
+      <div
+        class="border-brand-border mt-6 flex flex-col-reverse gap-3 border-t pt-5 sm:flex-row sm:justify-end"
+      >
+        <button
+          type="button"
+          class="border-brand-border focus-visible:ring-brand-teal min-h-11 rounded-xl border px-5 font-bold text-slate-700 outline-none focus-visible:ring-2"
+          (click)="closeAppointmentDialog()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="bg-brand-teal hover:bg-brand-teal-hover focus-visible:ring-brand-teal min-h-11 rounded-xl px-5 font-bold text-white outline-none focus-visible:ring-4"
+        >
+          Guardar cita
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog
+    #cancelDialog
+    class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl bg-white p-0 shadow-2xl"
+    aria-labelledby="cancel-appointment-dialog-title"
+    (cancel)="handleCancelDialogCancel($event)"
+    (click)="closeFromBackdrop($event, cancelDialog)"
+  >
+    <div class="p-6">
+      <span
+        class="grid size-12 place-items-center rounded-full bg-rose-50 text-rose-600"
+        aria-hidden="true"
+      >
+        <svg viewBox="0 0 24 24" class="size-6" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 3 2.8 19h18.4Z"></path>
+          <path d="M12 9v4M12 16.5v.1"></path>
+        </svg>
+      </span>
+      <h2 id="cancel-appointment-dialog-title" class="mt-4 text-xl font-extrabold text-brand-text">
+        Cancelar cita
+      </h2>
+      @if (pendingCancellation(); as appointment) {
+        <p class="text-brand-muted mt-2">
+          ¿Deseas cancelar la cita de
+          <strong class="text-brand-text">{{ appointment.clientName }}</strong
+          >?
+        </p>
+      }
+      <p class="text-brand-muted mt-2 text-sm">
+        La cita permanecerá visible en el historial y no podrá cambiar de estado.
+      </p>
+      <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <button
+          type="button"
+          class="border-brand-border focus-visible:ring-brand-teal min-h-11 rounded-xl border px-5 font-bold text-slate-700 outline-none focus-visible:ring-2"
+          (click)="cancelCancellation()"
+        >
+          Volver
+        </button>
+        <button
+          type="button"
+          class="bg-rose-600 hover:bg-rose-700 focus-visible:ring-rose-500 min-h-11 rounded-xl px-5 font-bold text-white outline-none focus-visible:ring-4"
+          (click)="confirmCancellation()"
+        >
+          Confirmar cancelación
+        </button>
+      </div>
+    </div>
+  </dialog>
+</div>

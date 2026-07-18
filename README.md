@@ -1,50 +1,64 @@
-# Frontend
+<div align="center">
 
-Base limpia para comenzar un nuevo proyecto con Angular y Tailwind CSS.
+# TurnoFácil
 
-## Requisitos
+### Gestión sencilla de citas y servicios
 
-- Node.js 24.15.0 (documentado en `.nvmrc`).
-- npm 11.12.1.
+![Portada de TurnoFácil](public/portada.png)
 
-## Desarrollo
+</div>
 
-Instala las dependencias y levanta el servidor local:
+## ¿Qué es TurnoFácil?
 
-```bash
-npm install
-npm start
-```
+TurnoFácil es una aplicación web pensada para ayudar a un negocio a organizar sus citas y consultar su agenda de manera rápida y clara.
 
-La aplicación estará disponible en `http://localhost:4200/`.
+Desde un solo lugar permite llevar el control de clientes, empleados y servicios, facilitando las tareas diarias del establecimiento.
 
-## Comandos
+## Funciones principales
 
-- `npm start`: inicia el servidor de desarrollo.
-- `npm run build`: genera la versión de producción.
-- `npm test`: ejecuta las pruebas unitarias.
-- `npm run watch`: compila en modo desarrollo y observa cambios.
-- `npx ng generate component nombre`: crea un componente.
+- Iniciar sesión en el sistema.
+- Consultar un resumen general del negocio.
+- Revisar y organizar la agenda.
+- Crear y administrar citas.
+- Gestionar la información de clientes.
+- Gestionar empleados y servicios ofrecidos.
 
-## Inicio de sesión
+## ¿Cómo ejecutar el proyecto?
 
-La primera funcionalidad se encuentra en `/login` y utiliza un componente standalone con carga
-diferida, Typed Reactive Forms y validaciones locales. Por ahora funciona exclusivamente en modo
-demostración y no realiza solicitudes HTTP.
+### Requisitos
 
-La implementación está organizada por funcionalidad en `src/app/features/auth/pages/login`.
+- Tener instalado [Node.js](https://nodejs.org/).
+- Tener una terminal disponible.
 
-## Despliegue en GitHub Pages
+### Pasos
 
-El workflow `.github/workflows/deploy-pages.yml` compila y publica automáticamente la aplicación
-cuando se envían cambios a la rama `develop`. También se puede ejecutar manualmente desde la
-pestaña **Actions** de GitHub.
+1. Abrir una terminal dentro de la carpeta del proyecto.
+2. Instalar las dependencias:
 
-La aplicación usa rutas con hash para que la navegación y la recarga de rutas internas funcionen
-correctamente en GitHub Pages. La URL de este repositorio será:
+   ```bash
+   npm install
+   ```
 
-`https://belawliet.github.io/Ibero-IngSoftware-MetodosSoftware-TurnoFacil-Frontend/`
+3. Iniciar la aplicación:
 
-Antes del primer despliegue, en GitHub abre **Settings > Pages** y selecciona **GitHub Actions**
-como origen de publicación. Después, envía estos archivos a `develop` o ejecuta manualmente el
-workflow **Deploy to GitHub Pages**.
+   ```bash
+   npm start
+   ```
+
+4. Abrir en el navegador: [http://localhost:4200](http://localhost:4200)
+
+## Tecnologías utilizadas
+
+El proyecto fue desarrollado con **Angular**, **TypeScript** y **Tailwind CSS**.
+
+## Estado del proyecto
+
+TurnoFácil se encuentra en desarrollo académico. Algunas funciones trabajan como demostración y pueden no estar conectadas todavía a un servidor o una base de datos.
+
+---
+
+<div align="center">
+
+Proyecto académico de Métodos de Software
+
+</div>

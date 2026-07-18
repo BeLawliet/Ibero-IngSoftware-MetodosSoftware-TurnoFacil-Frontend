@@ -1,5 +1,20 @@
 @import 'tailwindcss';
 
+@theme {
+  --color-brand-navy: #0d2036;
+  --color-brand-navy-light: #1b3049;
+  --color-brand-teal: #16aaa7;
+  --color-brand-teal-hover: #119693;
+  --color-brand-teal-soft: #eafaf8;
+  --color-brand-text: #111c30;
+  --color-brand-muted: #718399;
+  --color-brand-on-dark: #9db2c7;
+  --color-brand-border: #dce2e8;
+  --color-brand-error: #dc2626;
+  --font-sans:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
 html,
 body {
   min-height: 100%;
@@ -7,4 +22,12 @@ body {
 
 body {
   margin: 0;
+  background: var(--color-brand-navy);
+  color: var(--color-brand-text);
+  font-family: var(--font-sans);
+}
+
+button,
+input {
+  font: inherit;
 }

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
 import { LoginPage } from './login';
 
 describe('LoginPage', () => {
@@ -8,6 +9,7 @@ describe('LoginPage', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [LoginPage],
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LoginPage);
@@ -67,6 +69,9 @@ describe('LoginPage', () => {
   });
 
   it('should accept a valid form locally', () => {
+    const router = TestBed.inject(Router);
+    const navigation = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+
     component.loginForm.setValue({
       email: 'admin@empresa.com',
       password: 'demo',
@@ -79,6 +84,7 @@ describe('LoginPage', () => {
 
     expect(component.loginForm.valid).toBe(true);
     expect(component.demoSubmissionAccepted()).toBe(true);
+    expect(navigation).toHaveBeenCalledWith('/dashboard');
   });
 
   it('should mark every field as touched after an invalid submission', () => {

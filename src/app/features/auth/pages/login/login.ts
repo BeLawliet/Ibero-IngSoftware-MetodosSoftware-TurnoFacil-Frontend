@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 type LoginControlName = 'email' | 'password';
 
@@ -12,6 +13,7 @@ type LoginControlName = 'email' | 'password';
 })
 export class LoginPage {
   private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly router = inject(Router);
 
   readonly loginForm = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
@@ -39,6 +41,7 @@ export class LoginPage {
 
     this.demoSubmissionAccepted.set(true);
     this.announcement.set('Inicio de sesión de demostración validado localmente.');
+    void this.router.navigateByUrl('/dashboard');
   }
 
   protected announceUnavailable(action: string): void {

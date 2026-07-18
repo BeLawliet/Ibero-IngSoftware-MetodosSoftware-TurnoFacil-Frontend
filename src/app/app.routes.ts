@@ -12,6 +12,22 @@ export const routes: Routes = [
     redirectTo: 'login',
   },
   {
+    path: '',
+    loadComponent: () =>
+      import('./layouts/authenticated-shell/authenticated-shell').then(
+        ({ AuthenticatedShell }) => AuthenticatedShell,
+      ),
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/dashboard/pages/dashboard/dashboard').then(
+            ({ DashboardPage }) => DashboardPage,
+          ),
+      },
+    ],
+  },
+  {
     path: '**',
     redirectTo: 'login',
   },

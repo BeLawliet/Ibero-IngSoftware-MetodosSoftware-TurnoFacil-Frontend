@@ -1,0 +1,654 @@
+<div class="min-w-0 p-4 sm:p-6 lg:p-8">
+  <header class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-extrabold tracking-[-0.035em] text-brand-text sm:text-3xl">
+        Servicios
+      </h1>
+      <p class="text-brand-muted mt-2">Administra los servicios ofrecidos y su duración.</p>
+    </div>
+    <button
+      type="button"
+      class="bg-brand-teal hover:bg-brand-teal-hover focus-visible:ring-brand-teal inline-flex min-h-12 items-center justify-center gap-2 self-start rounded-xl px-5 font-bold text-white shadow-sm outline-none transition focus-visible:ring-4 focus-visible:ring-offset-2 sm:self-auto"
+      (click)="openCreateDialog()"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        class="size-5"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <path d="M12 5v14M5 12h14"></path>
+      </svg>
+      Nuevo servicio
+    </button>
+  </header>
+
+  @if (confirmationMessage()) {
+    <div
+      class="mt-5 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800"
+      role="status"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        class="size-5 shrink-0"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="m7.5 12 3 3 6-7"></path>
+      </svg>
+      {{ confirmationMessage() }}
+    </div>
+  }
+
+  <section class="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Resumen de servicios">
+    <article
+      class="border-brand-border flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm"
+    >
+      <span
+        class="bg-brand-teal-soft text-brand-teal grid size-11 shrink-0 place-items-center rounded-xl"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="size-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <path d="M4 7.5h16M6.5 3.5h11l2 4v12h-15v-12Z"></path>
+          <path d="M8 12h8M8 16h5"></path>
+        </svg>
+      </span>
+      <div>
+        <p class="text-brand-muted text-sm font-semibold">Total de servicios</p>
+        <p class="mt-1 text-2xl font-extrabold text-brand-text">{{ summary().total }}</p>
+      </div>
+    </article>
+    <article
+      class="border-brand-border flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm"
+    >
+      <span
+        class="grid size-11 shrink-0 place-items-center rounded-xl bg-emerald-50 text-emerald-600"
+        aria-hidden="true"
+      >
+        <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="m7.5 12 3 3 6-7"></path>
+        </svg>
+      </span>
+      <div>
+        <p class="text-brand-muted text-sm font-semibold">Servicios activos</p>
+        <p class="mt-1 text-2xl font-extrabold text-brand-text">{{ summary().active }}</p>
+      </div>
+    </article>
+    <article
+      class="border-brand-border flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm"
+    >
+      <span
+        class="grid size-11 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="size-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <circle cx="12" cy="12" r="8.5"></circle>
+          <path d="M12 7.5v5l3.5 2"></path>
+        </svg>
+      </span>
+      <div>
+        <p class="text-brand-muted text-sm font-semibold">Duración promedio</p>
+        <p class="mt-1 text-2xl font-extrabold text-brand-text">
+          {{ summary().averageDuration }} min
+        </p>
+      </div>
+    </article>
+    <article
+      class="border-brand-border flex min-w-0 items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm"
+    >
+      <span
+        class="grid size-11 shrink-0 place-items-center rounded-xl bg-violet-50 text-violet-600"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="size-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <path d="M12 3.5 14.6 9l5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.2L9.4 9Z"></path>
+        </svg>
+      </span>
+      <div class="min-w-0">
+        <p class="text-brand-muted text-sm font-semibold">Servicio más solicitado</p>
+        <p class="mt-1 truncate text-base font-extrabold text-brand-text">
+          {{ summary().mostRequested }}
+        </p>
+      </div>
+    </article>
+  </section>
+
+  <section
+    class="border-brand-border mt-6 rounded-2xl border bg-white p-4 shadow-sm sm:p-5"
+    aria-label="Búsqueda y filtros de servicios"
+  >
+    <div class="grid gap-3 lg:grid-cols-[minmax(16rem,1fr)_13rem_13rem_auto] lg:items-end">
+      <div class="min-w-0">
+        <label for="service-search" class="mb-2 block text-sm font-bold text-slate-700">
+          Buscar servicios
+        </label>
+        <div class="relative">
+          <svg
+            viewBox="0 0 24 24"
+            class="text-brand-muted pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+          >
+            <circle cx="10.5" cy="10.5" r="6.5"></circle>
+            <path d="m15.5 15.5 5 5"></path>
+          </svg>
+          <input
+            id="service-search"
+            type="search"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border bg-slate-50 pr-4 pl-12 text-sm outline-none transition focus:ring-4"
+            placeholder="Nombre, categoría o descripción"
+            [value]="searchTerm()"
+            (input)="updateSearch($event)"
+          />
+        </div>
+      </div>
+      <div>
+        <label for="service-status" class="mb-2 block text-sm font-bold text-slate-700">
+          Estado
+        </label>
+        <select
+          id="service-status"
+          class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border bg-slate-50 px-4 text-sm outline-none transition focus:ring-4"
+          [value]="statusFilter()"
+          (change)="updateStatusFilter($event)"
+        >
+          <option>Todos</option>
+          <option>Activos</option>
+          <option>Inactivos</option>
+        </select>
+      </div>
+      <div>
+        <label for="service-category-filter" class="mb-2 block text-sm font-bold text-slate-700">
+          Categoría
+        </label>
+        <select
+          id="service-category-filter"
+          class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border bg-slate-50 px-4 text-sm outline-none transition focus:ring-4"
+          [value]="categoryFilter()"
+          (change)="updateCategoryFilter($event)"
+        >
+          <option>Todas</option>
+          @for (category of categories; track category) {
+            <option [value]="category">{{ category }}</option>
+          }
+        </select>
+      </div>
+      @if (hasFilters()) {
+        <button
+          type="button"
+          class="border-brand-border hover:bg-slate-50 focus-visible:ring-brand-teal h-12 rounded-xl border px-4 text-sm font-bold text-slate-700 outline-none focus-visible:ring-2"
+          (click)="clearFilters()"
+        >
+          Limpiar filtros
+        </button>
+      }
+    </div>
+    <p class="text-brand-muted mt-3 text-sm" aria-live="polite">
+      {{ filteredServices().length }} servicios encontrados
+    </p>
+  </section>
+
+  <section
+    class="border-brand-border mt-6 min-w-0 rounded-2xl border bg-white shadow-sm"
+    aria-labelledby="services-list-title"
+  >
+    <div class="border-brand-border border-b px-5 py-5 sm:px-6">
+      <h2 id="services-list-title" class="text-lg font-bold text-brand-text">
+        Servicios registrados
+      </h2>
+    </div>
+
+    @if (filteredServices().length === 0) {
+      <div class="px-6 py-14 text-center">
+        <p class="font-bold text-brand-text">No se encontraron servicios</p>
+        <p class="text-brand-muted mt-2 text-sm">Prueba con otros criterios de búsqueda.</p>
+      </div>
+    } @else {
+      <div class="hidden lg:block">
+        <table class="w-full table-fixed border-collapse text-left">
+          <thead class="bg-slate-50 text-xs tracking-wide text-slate-500 uppercase">
+            <tr>
+              <th scope="col" class="w-[25%] px-5 py-3 font-semibold">Servicio</th>
+              <th scope="col" class="w-[13%] px-3 py-3 font-semibold">Categoría</th>
+              <th scope="col" class="w-[12%] px-3 py-3 font-semibold">Duración</th>
+              <th scope="col" class="w-[14%] px-3 py-3 font-semibold">Precio</th>
+              <th scope="col" class="w-[16%] px-3 py-3 font-semibold">Empleados asignados</th>
+              <th scope="col" class="w-[11%] px-3 py-3 font-semibold">Estado</th>
+              <th scope="col" class="w-[9%] px-3 py-3 text-right font-semibold">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-brand-border divide-y">
+            @for (service of filteredServices(); track service.id) {
+              <tr class="text-sm">
+                <td class="px-5 py-4">
+                  <div class="flex min-w-0 items-start gap-3">
+                    <span
+                      class="mt-1 size-3 shrink-0 rounded-full"
+                      [class]="indicatorClass(service.color)"
+                      aria-hidden="true"
+                    ></span>
+                    <div class="min-w-0">
+                      <p class="truncate font-bold text-brand-text">{{ service.name }}</p>
+                      <p class="text-brand-muted mt-1 line-clamp-2 text-xs">
+                        {{ service.description }}
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-brand-muted px-3 py-4">{{ service.category }}</td>
+                <td class="text-brand-muted px-3 py-4">{{ formatDuration(service.duration) }}</td>
+                <td class="px-3 py-4 font-semibold text-slate-700">
+                  {{ formatPrice(service.price) }}
+                </td>
+                <td class="text-brand-muted px-3 py-4">
+                  {{ service.assignedEmployees }}
+                  {{ service.assignedEmployees === 1 ? 'empleado' : 'empleados' }}
+                </td>
+                <td class="px-3 py-4">
+                  <span
+                    class="inline-flex rounded-full px-2.5 py-1 text-xs font-bold ring-1 ring-inset"
+                    [class]="
+                      service.active
+                        ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/15'
+                        : 'bg-slate-100 text-slate-600 ring-slate-500/15'
+                    "
+                  >
+                    {{ service.active ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </td>
+                <td class="relative px-3 py-4 text-right">
+                  <button
+                    type="button"
+                    class="hover:bg-slate-100 focus-visible:ring-brand-teal inline-grid size-10 place-items-center rounded-lg text-slate-600 outline-none focus-visible:ring-2"
+                    [attr.aria-label]="'Acciones para ' + service.name"
+                    [attr.aria-expanded]="actionsServiceId() === service.id"
+                    (click)="toggleActions(service.id)"
+                  >
+                    <svg viewBox="0 0 24 24" class="size-5" fill="currentColor" aria-hidden="true">
+                      <circle cx="5" cy="12" r="1.7"></circle>
+                      <circle cx="12" cy="12" r="1.7"></circle>
+                      <circle cx="19" cy="12" r="1.7"></circle>
+                    </svg>
+                  </button>
+                  @if (actionsServiceId() === service.id) {
+                    <div
+                      class="border-brand-border absolute top-13 right-3 z-20 w-40 rounded-xl border bg-white p-1.5 text-left shadow-lg"
+                      role="menu"
+                    >
+                      <button
+                        type="button"
+                        role="menuitem"
+                        class="hover:bg-slate-50 focus-visible:bg-slate-50 w-full rounded-lg px-3 py-2 text-left text-sm font-semibold outline-none"
+                        (click)="openEditDialog(service)"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        class="hover:bg-slate-50 focus-visible:bg-slate-50 w-full rounded-lg px-3 py-2 text-left text-sm font-semibold outline-none"
+                        (click)="requestStatusChange(service)"
+                      >
+                        {{ service.active ? 'Desactivar' : 'Activar' }}
+                      </button>
+                    </div>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <ul class="divide-brand-border divide-y lg:hidden">
+        @for (service of filteredServices(); track service.id) {
+          <li class="p-5">
+            <div class="flex items-start gap-3">
+              <span
+                class="mt-1.5 size-3 shrink-0 rounded-full"
+                [class]="indicatorClass(service.color)"
+                aria-hidden="true"
+              ></span>
+              <div class="min-w-0 flex-1">
+                <p class="font-bold text-brand-text">{{ service.name }}</p>
+                <p class="text-brand-muted mt-1 text-sm">{{ service.description }}</p>
+              </div>
+              <span
+                class="inline-flex shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ring-1 ring-inset"
+                [class]="
+                  service.active
+                    ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/15'
+                    : 'bg-slate-100 text-slate-600 ring-slate-500/15'
+                "
+              >
+                {{ service.active ? 'Activo' : 'Inactivo' }}
+              </span>
+            </div>
+            <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <dt class="text-brand-muted text-xs">Categoría</dt>
+                <dd class="mt-1 font-semibold text-slate-700">{{ service.category }}</dd>
+              </div>
+              <div>
+                <dt class="text-brand-muted text-xs">Duración</dt>
+                <dd class="mt-1 font-semibold text-slate-700">
+                  {{ formatDuration(service.duration) }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-brand-muted text-xs">Precio</dt>
+                <dd class="mt-1 font-semibold text-slate-700">{{ formatPrice(service.price) }}</dd>
+              </div>
+              <div>
+                <dt class="text-brand-muted text-xs">Empleados asignados</dt>
+                <dd class="mt-1 font-semibold text-slate-700">{{ service.assignedEmployees }}</dd>
+              </div>
+            </dl>
+            <div class="mt-4 flex gap-2">
+              <button
+                type="button"
+                class="border-brand-border focus-visible:ring-brand-teal flex-1 rounded-lg border px-3 py-2 text-sm font-bold outline-none focus-visible:ring-2"
+                [attr.aria-label]="'Editar ' + service.name"
+                (click)="openEditDialog(service)"
+              >
+                Editar
+              </button>
+              <button
+                type="button"
+                class="border-brand-border focus-visible:ring-brand-teal flex-1 rounded-lg border px-3 py-2 text-sm font-bold outline-none focus-visible:ring-2"
+                [attr.aria-label]="(service.active ? 'Desactivar ' : 'Activar ') + service.name"
+                (click)="requestStatusChange(service)"
+              >
+                {{ service.active ? 'Desactivar' : 'Activar' }}
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <dialog
+    #serviceDialog
+    class="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-2xl bg-white p-0 shadow-2xl"
+    aria-labelledby="service-dialog-title"
+    (cancel)="handleServiceDialogCancel($event)"
+    (click)="closeFromBackdrop($event, serviceDialog)"
+  >
+    <div class="border-brand-border flex items-center justify-between border-b px-5 py-4 sm:px-6">
+      <div>
+        <h2 id="service-dialog-title" class="text-xl font-extrabold text-brand-text">
+          {{ formMode() === 'create' ? 'Nuevo servicio' : 'Editar servicio' }}
+        </h2>
+        <p class="text-brand-muted mt-1 text-sm">Completa la información del servicio.</p>
+      </div>
+      <button
+        type="button"
+        class="hover:bg-slate-100 focus-visible:ring-brand-teal grid size-10 place-items-center rounded-lg outline-none focus-visible:ring-2"
+        aria-label="Cerrar formulario de servicio"
+        (click)="closeServiceDialog()"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="size-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path d="m6 6 12 12M18 6 6 18"></path>
+        </svg>
+      </button>
+    </div>
+    <form class="p-5 sm:p-6" [formGroup]="serviceForm" (ngSubmit)="saveService()" novalidate>
+      <div>
+        <label for="service-name" class="mb-2 block text-sm font-bold text-slate-700">
+          Nombre del servicio
+        </label>
+        <input
+          id="service-name"
+          formControlName="name"
+          class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border px-4 outline-none focus:ring-4"
+          [class.border-brand-error]="showError('name')"
+          [attr.aria-invalid]="showError('name')"
+          [attr.aria-describedby]="showError('name') ? 'service-name-error' : null"
+        />
+        @if (showError('name')) {
+          <p id="service-name-error" class="text-brand-error mt-2 text-sm" role="alert">
+            El nombre del servicio es obligatorio.
+          </p>
+        }
+      </div>
+
+      <div class="mt-5">
+        <label for="service-description" class="mb-2 block text-sm font-bold text-slate-700">
+          Descripción <span class="text-brand-muted font-normal">(opcional)</span>
+        </label>
+        <textarea
+          id="service-description"
+          formControlName="description"
+          rows="3"
+          maxlength="180"
+          class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 w-full resize-y rounded-xl border px-4 py-3 outline-none focus:ring-4"
+          [class.border-brand-error]="showError('description')"
+          [attr.aria-invalid]="showError('description')"
+          [attr.aria-describedby]="
+            showError('description') ? 'service-description-error' : 'service-description-help'
+          "
+        ></textarea>
+        @if (showError('description')) {
+          <p id="service-description-error" class="text-brand-error mt-2 text-sm" role="alert">
+            La descripción no puede superar los 180 caracteres.
+          </p>
+        } @else {
+          <p id="service-description-help" class="text-brand-muted mt-2 text-xs">
+            Máximo 180 caracteres.
+          </p>
+        }
+      </div>
+
+      <div class="mt-5 grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="service-category" class="mb-2 block text-sm font-bold text-slate-700">
+            Categoría
+          </label>
+          <select
+            id="service-category"
+            formControlName="category"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border px-4 outline-none focus:ring-4"
+            [class.border-brand-error]="showError('category')"
+            [attr.aria-invalid]="showError('category')"
+            [attr.aria-describedby]="showError('category') ? 'service-category-error' : null"
+          >
+            <option value="">Selecciona una categoría</option>
+            @for (category of categories; track category) {
+              <option [value]="category">{{ category }}</option>
+            }
+          </select>
+          @if (showError('category')) {
+            <p id="service-category-error" class="text-brand-error mt-2 text-sm" role="alert">
+              La categoría es obligatoria.
+            </p>
+          }
+        </div>
+        <div>
+          <label for="service-duration" class="mb-2 block text-sm font-bold text-slate-700">
+            Duración
+          </label>
+          <select
+            id="service-duration"
+            formControlName="duration"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border px-4 outline-none focus:ring-4"
+            [class.border-brand-error]="showError('duration')"
+            [attr.aria-invalid]="showError('duration')"
+            [attr.aria-describedby]="showError('duration') ? 'service-duration-error' : null"
+          >
+            <option value="">Selecciona una duración</option>
+            @for (duration of durations; track duration) {
+              <option [value]="duration">{{ formatDuration(duration) }}</option>
+            }
+          </select>
+          @if (showError('duration')) {
+            <p id="service-duration-error" class="text-brand-error mt-2 text-sm" role="alert">
+              Selecciona una duración mayor que cero.
+            </p>
+          }
+        </div>
+        <div>
+          <label for="service-price" class="mb-2 block text-sm font-bold text-slate-700">
+            Precio
+          </label>
+          <div class="relative">
+            <span
+              class="text-brand-muted pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 font-semibold"
+              aria-hidden="true"
+              >$</span
+            >
+            <input
+              id="service-price"
+              type="number"
+              min="0"
+              step="1000"
+              inputmode="numeric"
+              formControlName="price"
+              class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-12 w-full rounded-xl border pr-4 pl-8 outline-none focus:ring-4"
+              [class.border-brand-error]="showError('price')"
+              [attr.aria-invalid]="showError('price')"
+              [attr.aria-describedby]="showError('price') ? 'service-price-error' : null"
+            />
+          </div>
+          @if (showError('price')) {
+            <p id="service-price-error" class="text-brand-error mt-2 text-sm" role="alert">
+              {{
+                serviceForm.controls.price.hasError('required')
+                  ? 'El precio es obligatorio.'
+                  : 'El precio debe ser igual o mayor que cero.'
+              }}
+            </p>
+          }
+        </div>
+      </div>
+
+      <fieldset class="mt-5">
+        <legend class="mb-3 text-sm font-bold text-slate-700">Color identificador</legend>
+        <div class="flex flex-wrap gap-3">
+          @for (option of colorOptions; track option.name) {
+            <label
+              class="border-brand-border focus-within:ring-brand-teal flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold text-slate-700 focus-within:ring-2"
+              [class.border-brand-teal]="serviceForm.controls.color.value === option.name"
+            >
+              <input type="radio" formControlName="color" [value]="option.name" class="sr-only" />
+              <span
+                class="size-5 rounded-full"
+                [class]="option.swatchClass"
+                aria-hidden="true"
+              ></span>
+              {{ option.name }}
+            </label>
+          }
+        </div>
+      </fieldset>
+
+      <label class="mt-5 flex items-center gap-3 text-sm font-bold text-slate-700">
+        <input
+          type="checkbox"
+          formControlName="active"
+          class="text-brand-teal focus:ring-brand-teal size-5 rounded border-slate-300"
+        />
+        Estado activo
+      </label>
+      <div
+        class="border-brand-border mt-6 flex flex-col-reverse gap-3 border-t pt-5 sm:flex-row sm:justify-end"
+      >
+        <button
+          type="button"
+          class="border-brand-border focus-visible:ring-brand-teal min-h-11 rounded-xl border px-5 font-bold text-slate-700 outline-none focus-visible:ring-2"
+          (click)="closeServiceDialog()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="bg-brand-teal hover:bg-brand-teal-hover focus-visible:ring-brand-teal min-h-11 rounded-xl px-5 font-bold text-white outline-none focus-visible:ring-4"
+        >
+          Guardar servicio
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog
+    #statusDialog
+    class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl bg-white p-0 shadow-2xl"
+    aria-labelledby="service-status-dialog-title"
+    (cancel)="handleStatusDialogCancel($event)"
+    (click)="closeFromBackdrop($event, statusDialog)"
+  >
+    <div class="p-6">
+      <span
+        class="grid size-12 place-items-center rounded-full bg-amber-50 text-amber-600"
+        aria-hidden="true"
+      >
+        <svg viewBox="0 0 24 24" class="size-6" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 3 2.8 19h18.4Z"></path>
+          <path d="M12 9v4M12 16.5v.1"></path>
+        </svg>
+      </span>
+      <h2 id="service-status-dialog-title" class="mt-4 text-xl font-extrabold text-brand-text">
+        Confirmar cambio de estado
+      </h2>
+      @if (pendingStatusService(); as service) {
+        <p class="text-brand-muted mt-2">
+          {{ service.active ? '¿Deseas desactivar ' : '¿Deseas activar '
+          }}<strong class="text-brand-text">{{ service.name }}</strong
+          >?
+        </p>
+      }
+      <p class="text-brand-muted mt-2 text-sm">
+        El servicio no será eliminado y podrá cambiarse nuevamente.
+      </p>
+      <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <button
+          type="button"
+          class="border-brand-border focus-visible:ring-brand-teal min-h-11 rounded-xl border px-5 font-bold text-slate-700 outline-none focus-visible:ring-2"
+          (click)="cancelStatusChange()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="bg-brand-teal hover:bg-brand-teal-hover focus-visible:ring-brand-teal min-h-11 rounded-xl px-5 font-bold text-white outline-none focus-visible:ring-4"
+          (click)="confirmStatusChange()"
+        >
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </dialog>
+</div>

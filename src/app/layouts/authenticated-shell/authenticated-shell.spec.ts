@@ -34,17 +34,19 @@ describe('AuthenticatedShell', () => {
     );
   });
 
-  it('should render only dashboard as an implemented navigation link', () => {
+  it('should render the implemented navigation links', () => {
     const navigation = (fixture.nativeElement as HTMLElement).querySelector(
       'nav[aria-label="Navegación principal"]',
     );
     const links = navigation?.querySelectorAll('a');
     const disabledItems = navigation?.querySelectorAll('[aria-disabled="true"]');
 
-    expect(links).toHaveLength(2);
+    expect(links).toHaveLength(4);
     expect(links?.[0].getAttribute('href')).toBe('/dashboard');
     expect(links?.[1].getAttribute('href')).toBe('/clientes');
-    expect(disabledItems).toHaveLength(5);
+    expect(links?.[2].getAttribute('href')).toBe('/empleados');
+    expect(links?.[3].getAttribute('href')).toBe('/servicios');
+    expect(disabledItems).toHaveLength(3);
   });
 
   it('should open the mobile menu and lock document scrolling', () => {

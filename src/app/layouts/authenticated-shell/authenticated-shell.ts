@@ -10,8 +10,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { NavigationEnd } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-authenticated-shell',
@@ -111,7 +110,16 @@ export class AuthenticatedShell {
   }
 
   private resolvePageTitle(url: string): string {
-    return url.startsWith('/clientes') ? 'Clientes' : 'Inicio';
+    if (url.startsWith('/clientes')) {
+      return 'Clientes';
+    }
+    if (url.startsWith('/empleados')) {
+      return 'Empleados';
+    }
+    if (url.startsWith('/servicios')) {
+      return 'Servicios';
+    }
+    return 'Inicio';
   }
 
   private formatIsoDate(date: Date): string {

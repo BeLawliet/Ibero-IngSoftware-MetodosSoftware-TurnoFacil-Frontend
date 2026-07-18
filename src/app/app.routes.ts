@@ -30,6 +30,20 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/clients/pages/clients/clients').then(({ ClientsPage }) => ClientsPage),
       },
+      {
+        path: 'empleados',
+        loadComponent: () =>
+          import('./features/employees/pages/employees/employees').then(
+            ({ EmployeesPage }) => EmployeesPage,
+          ),
+      },
+      {
+        path: 'servicios',
+        loadComponent: () =>
+          import('./features/services/pages/services/services').then(
+            ({ ServicesPage }) => ServicesPage,
+          ),
+      },
     ],
   },
   {

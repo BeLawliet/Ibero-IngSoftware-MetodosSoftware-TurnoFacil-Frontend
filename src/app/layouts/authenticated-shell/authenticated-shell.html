@@ -148,9 +148,13 @@
           </a>
         </li>
         <li>
-          <span
-            class="flex min-h-12 items-center gap-3 rounded-xl px-4 text-white/55"
-            aria-disabled="true"
+          <a
+            routerLink="/empleados"
+            routerLinkActive="bg-brand-teal text-white shadow-sm"
+            [routerLinkActiveOptions]="{ exact: true }"
+            ariaCurrentWhenActive="page"
+            class="focus-visible:ring-brand-teal flex min-h-12 items-center gap-3 rounded-xl px-4 font-semibold text-white/75 outline-none transition hover:bg-white/10 hover:text-white focus-visible:ring-2"
+            (click)="closeMenu(false)"
           >
             <svg
               viewBox="0 0 24 24"
@@ -164,12 +168,16 @@
               <path d="M5 20v-2a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2"></path>
             </svg>
             Empleados
-          </span>
+          </a>
         </li>
         <li>
-          <span
-            class="flex min-h-12 items-center gap-3 rounded-xl px-4 text-white/55"
-            aria-disabled="true"
+          <a
+            routerLink="/servicios"
+            routerLinkActive="bg-brand-teal text-white shadow-sm"
+            [routerLinkActiveOptions]="{ exact: true }"
+            ariaCurrentWhenActive="page"
+            class="focus-visible:ring-brand-teal flex min-h-12 items-center gap-3 rounded-xl px-4 font-semibold text-white/75 outline-none transition hover:bg-white/10 hover:text-white focus-visible:ring-2"
+            (click)="closeMenu(false)"
           >
             <svg
               viewBox="0 0 24 24"
@@ -182,7 +190,7 @@
               <path d="M4 7.5h16M6.5 3.5h11l2 4v12h-15v-12ZM8 12h8M8 16h5"></path>
             </svg>
             Servicios
-          </span>
+          </a>
         </li>
         <li>
           <span

@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "TurnoFacil": {
+    "Frontend": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -56,10 +56,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "TurnoFacil:build:production"
+              "buildTarget": "Frontend:build:production"
             },
             "development": {
-              "buildTarget": "TurnoFacil:build:development"
+              "buildTarget": "Frontend:build:development"
             }
           },
           "defaultConfiguration": "development"

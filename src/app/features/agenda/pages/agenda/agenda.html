@@ -1,0 +1,426 @@
+<div class="min-w-0 p-4 sm:p-6 lg:p-8">
+  <header class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-extrabold tracking-[-0.035em] text-brand-text sm:text-3xl">
+        Agenda
+      </h1>
+      <p class="text-brand-muted mt-2">Consulta la programación y disponibilidad de tu equipo.</p>
+    </div>
+    <a
+      routerLink="/citas"
+      [queryParams]="{ nueva: true }"
+      class="bg-brand-teal hover:bg-brand-teal-hover focus-visible:ring-brand-teal inline-flex min-h-12 items-center justify-center gap-2 self-start rounded-xl px-5 font-bold text-white shadow-sm outline-none transition focus-visible:ring-4 focus-visible:ring-offset-2 sm:self-auto"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        class="size-5"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <path d="M12 5v14M5 12h14"></path>
+      </svg>
+      Nueva cita
+    </a>
+  </header>
+
+  <section
+    class="border-brand-border mt-7 rounded-2xl border bg-white p-4 shadow-sm sm:p-5"
+    aria-label="Navegación y filtros de agenda"
+  >
+    <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+      <div>
+        <p class="mb-2 text-sm font-bold text-slate-700">Semana visible</p>
+        <div class="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            class="border-brand-border hover:bg-slate-50 focus-visible:ring-brand-teal grid size-11 place-items-center rounded-xl border text-slate-700 outline-none focus-visible:ring-2"
+            aria-label="Ir a la semana anterior"
+            (click)="previousWeek()"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              class="size-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path d="m15 5-7 7 7 7"></path>
+            </svg>
+          </button>
+          <button
+            type="button"
+            class="border-brand-border hover:bg-slate-50 focus-visible:ring-brand-teal min-h-11 rounded-xl border px-4 text-sm font-bold text-slate-700 outline-none focus-visible:ring-2"
+            (click)="goToToday()"
+          >
+            Hoy
+          </button>
+          <button
+            type="button"
+            class="border-brand-border hover:bg-slate-50 focus-visible:ring-brand-teal grid size-11 place-items-center rounded-xl border text-slate-700 outline-none focus-visible:ring-2"
+            aria-label="Ir a la semana siguiente"
+            (click)="nextWeek()"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              class="size-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path d="m9 5 7 7-7 7"></path>
+            </svg>
+          </button>
+          <p class="ml-1 font-extrabold text-brand-text" aria-live="polite">{{ rangeLabel() }}</p>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div class="sm:w-52">
+          <label for="agenda-employee-filter" class="mb-2 block text-sm font-bold text-slate-700">
+            Empleado
+          </label>
+          <select
+            id="agenda-employee-filter"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-11 w-full rounded-xl border bg-slate-50 px-4 text-sm outline-none transition focus:ring-4"
+            [value]="employeeFilter()"
+            (change)="updateEmployeeFilter($event)"
+          >
+            <option value="Todos">Todos</option>
+            @for (employee of employees; track employee.id) {
+              <option [value]="employee.id">{{ employee.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="sm:w-44">
+          <label for="agenda-status-filter" class="mb-2 block text-sm font-bold text-slate-700">
+            Estado
+          </label>
+          <select
+            id="agenda-status-filter"
+            class="border-brand-border focus:border-brand-teal focus:ring-brand-teal/20 h-11 w-full rounded-xl border bg-slate-50 px-4 text-sm outline-none transition focus:ring-4"
+            [value]="statusFilter()"
+            (change)="updateStatusFilter($event)"
+          >
+            <option>Todos</option>
+            <option>Programada</option>
+            <option>En atención</option>
+            <option>Atendida</option>
+            <option>Cancelada</option>
+          </select>
+        </div>
+        @if (hasFilters()) {
+          <button
+            type="button"
+            class="border-brand-border hover:bg-slate-50 focus-visible:ring-brand-teal min-h-11 rounded-xl border px-4 text-sm font-bold text-slate-700 outline-none focus-visible:ring-2"
+            (click)="clearFilters()"
+          >
+            Limpiar filtros
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  @if (visibleAppointments().length === 0) {
+    <section
+      class="border-brand-border mt-6 rounded-2xl border bg-white px-6 py-14 text-center shadow-sm"
+      aria-labelledby="empty-agenda-title"
+    >
+      <span
+        class="bg-brand-teal-soft text-brand-teal mx-auto grid size-14 place-items-center rounded-2xl"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="size-7"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <rect x="4" y="5.5" width="16" height="14" rx="2"></rect>
+          <path d="M8 3.5v4M16 3.5v4M4 10h16"></path>
+        </svg>
+      </span>
+      <h2 id="empty-agenda-title" class="mt-4 text-xl font-extrabold text-brand-text">
+        No hay citas programadas
+      </h2>
+      <p class="text-brand-muted mt-2">
+        No encontramos citas para esta semana y los filtros seleccionados.
+      </p>
+      <a
+        routerLink="/citas"
+        [queryParams]="{ nueva: true }"
+        class="bg-brand-teal hover:bg-brand-teal-hover focus-visible:ring-brand-teal mt-5 inline-flex min-h-11 items-center rounded-xl px-5 font-bold text-white outline-none focus-visible:ring-4"
+      >
+        Crear una cita
+      </a>
+    </section>
+  } @else {
+    <section
+      class="border-brand-border mt-6 hidden min-w-0 overflow-hidden rounded-2xl border bg-white shadow-sm lg:block"
+      aria-label="Calendario semanal"
+    >
+      <div class="max-w-full overflow-x-auto">
+        <div class="min-w-[70rem]">
+          <div class="grid grid-cols-[4.5rem_repeat(7,minmax(0,1fr))] border-b border-brand-border">
+            <div class="bg-slate-50" aria-hidden="true"></div>
+            @for (day of weekDays(); track day.iso) {
+              <div
+                class="border-brand-border border-l px-2 py-4 text-center"
+                [class.bg-brand-teal-soft]="day.isToday"
+              >
+                <p class="text-brand-muted text-xs font-bold uppercase">{{ day.dayName }}</p>
+                <p
+                  class="mt-1 font-extrabold"
+                  [class.text-brand-teal]="day.isToday"
+                  [class.text-brand-text]="!day.isToday"
+                >
+                  {{ day.dateLabel }}
+                </p>
+                @if (day.isToday) {
+                  <span class="text-brand-teal text-[0.65rem] font-bold uppercase">Hoy</span>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="grid grid-cols-[4.5rem_repeat(7,minmax(0,1fr))]">
+            <div class="relative h-[52rem] bg-slate-50" aria-label="Horas de la agenda">
+              @for (hour of hourLabels; track hour; let index = $index) {
+                <time
+                  class="text-brand-muted absolute right-2 -translate-y-1/2 text-xs font-semibold"
+                  [style.top.rem]="index * 4"
+                  >{{ hour }}</time
+                >
+              }
+            </div>
+
+            @for (day of weekDays(); track day.iso) {
+              <div
+                class="agenda-day-column border-brand-border relative h-[52rem] border-l"
+                [class.bg-teal-50]="day.isToday"
+                [attr.aria-label]="'Agenda del ' + formatLongDate(day.iso)"
+              >
+                @for (slot of slotTimes; track slot; let index = $index) {
+                  @if (isSlotFree(day.iso, slot)) {
+                    <button
+                      type="button"
+                      data-testid="free-slot"
+                      class="focus-visible:ring-brand-teal absolute right-0 left-0 z-0 h-8 outline-none hover:bg-brand-teal-soft/60 focus-visible:z-30 focus-visible:ring-2 focus-visible:ring-inset"
+                      [style.top.rem]="index * 2"
+                      [attr.aria-label]="
+                        'Crear cita el ' + formatLongDate(day.iso) + ' a las ' + slot
+                      "
+                      (click)="createAt(day.iso, slot)"
+                    ></button>
+                  }
+                }
+
+                @for (appointment of appointmentsForDay(day.iso); track appointment.id) {
+                  @if (isInVisibleHours(appointment)) {
+                    <button
+                      type="button"
+                      data-testid="calendar-appointment"
+                      class="focus-visible:ring-brand-teal absolute right-1 left-1 z-10 overflow-hidden rounded-lg border-l-4 p-1.5 text-left text-[0.68rem] shadow-sm outline-none transition hover:z-20 hover:shadow-md focus-visible:z-30 focus-visible:ring-2"
+                      [class]="employeeColor(appointment.employeeId)"
+                      [class.opacity-60]="appointment.status === 'Cancelada'"
+                      [style.top.rem]="appointmentTop(appointment)"
+                      [style.height.rem]="appointmentHeight(appointment)"
+                      [attr.aria-label]="
+                        appointment.startTime +
+                        ', ' +
+                        appointment.clientName +
+                        ', ' +
+                        appointment.serviceName +
+                        ', ' +
+                        appointment.status
+                      "
+                      (click)="openDetail(appointment)"
+                    >
+                      <span class="block truncate font-extrabold">
+                        {{ appointment.startTime }} - {{ appointment.endTime }}
+                      </span>
+                      <span class="block truncate font-bold">{{ appointment.clientName }}</span>
+                      <span class="block truncate">{{ appointment.serviceName }}</span>
+                      <span
+                        class="mt-0.5 inline-flex rounded px-1 py-0.5 text-[0.6rem] font-bold"
+                        [class]="statusClass(appointment.status)"
+                      >
+                        {{ appointment.status }}
+                      </span>
+                    </button>
+                  }
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-6 min-w-0 lg:hidden" aria-labelledby="mobile-agenda-title">
+      <h2 id="mobile-agenda-title" class="sr-only">Agenda por día</h2>
+      <div class="max-w-full overflow-x-auto pb-2" aria-label="Seleccionar día de la semana">
+        <div class="flex w-max gap-2">
+          @for (day of weekDays(); track day.iso) {
+            <button
+              type="button"
+              class="border-brand-border focus-visible:ring-brand-teal min-w-20 rounded-xl border bg-white px-3 py-3 text-center shadow-sm outline-none focus-visible:ring-2"
+              [class.border-brand-teal]="selectedDate() === day.iso"
+              [class.bg-brand-teal-soft]="selectedDate() === day.iso"
+              [attr.aria-pressed]="selectedDate() === day.iso"
+              (click)="selectDate(day.iso)"
+            >
+              <span class="text-brand-muted block text-xs font-bold uppercase">{{
+                day.dayName
+              }}</span>
+              <span class="mt-1 block font-extrabold text-brand-text">{{ day.dateLabel }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="border-brand-border mt-3 rounded-2xl border bg-white shadow-sm">
+        <div class="border-brand-border border-b px-5 py-4">
+          <h3 class="font-extrabold text-brand-text">{{ formatLongDate(selectedDate()) }}</h3>
+        </div>
+        @if (appointmentsForDay(selectedDate()).length === 0) {
+          <div class="px-5 py-10 text-center">
+            <p class="font-bold text-brand-text">No hay citas para este día</p>
+            <p class="text-brand-muted mt-2 text-sm">Selecciona otro día o crea una nueva cita.</p>
+          </div>
+        } @else {
+          <ul class="divide-brand-border divide-y">
+            @for (appointment of appointmentsForDay(selectedDate()); track appointment.id) {
+              <li class="p-5" [class.opacity-60]="appointment.status === 'Cancelada'">
+                <button
+                  type="button"
+                  class="focus-visible:ring-brand-teal w-full rounded-lg text-left outline-none focus-visible:ring-2"
+                  (click)="openDetail(appointment)"
+                >
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <p class="text-brand-teal font-extrabold">
+                        {{ appointment.startTime }} - {{ appointment.endTime }}
+                      </p>
+                      <p class="mt-1 font-bold text-brand-text">{{ appointment.clientName }}</p>
+                    </div>
+                    <span
+                      class="shrink-0 rounded-full px-2.5 py-1 text-xs font-bold"
+                      [class]="statusClass(appointment.status)"
+                    >
+                      {{ appointment.status }}
+                    </span>
+                  </div>
+                  <p class="text-brand-muted mt-2 text-sm">{{ appointment.serviceName }}</p>
+                  <p class="text-brand-muted mt-1 text-xs">{{ appointment.employeeName }}</p>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </section>
+  }
+
+  <dialog
+    #detailDialog
+    class="m-auto w-[calc(100%-2rem)] max-w-lg rounded-2xl bg-white p-0 shadow-2xl"
+    aria-labelledby="appointment-detail-title"
+    (cancel)="handleDetailCancel($event)"
+    (click)="closeDetailFromBackdrop($event, detailDialog)"
+  >
+    <div class="border-brand-border flex items-center justify-between border-b px-5 py-4 sm:px-6">
+      <h2 id="appointment-detail-title" class="text-xl font-extrabold text-brand-text">
+        Detalle de la cita
+      </h2>
+      <button
+        type="button"
+        class="hover:bg-slate-100 focus-visible:ring-brand-teal grid size-10 place-items-center rounded-lg outline-none focus-visible:ring-2"
+        aria-label="Cerrar detalle de la cita"
+        (click)="closeDetail()"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="size-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path d="m6 6 12 12M18 6 6 18"></path>
+        </svg>
+      </button>
+    </div>
+    @if (selectedAppointment(); as appointment) {
+      <div class="p-5 sm:p-6">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="text-brand-muted text-xs font-semibold">Cliente</p>
+            <p class="mt-1 text-lg font-extrabold text-brand-text">{{ appointment.clientName }}</p>
+          </div>
+          <span
+            class="rounded-full px-2.5 py-1 text-xs font-bold"
+            [class]="statusClass(appointment.status)"
+          >
+            {{ appointment.status }}
+          </span>
+        </div>
+        <dl class="mt-5 grid gap-4 sm:grid-cols-2">
+          <div>
+            <dt class="text-brand-muted text-xs font-semibold">Servicio</dt>
+            <dd class="mt-1 font-bold text-slate-700">{{ appointment.serviceName }}</dd>
+          </div>
+          <div>
+            <dt class="text-brand-muted text-xs font-semibold">Empleado</dt>
+            <dd class="mt-1 font-bold text-slate-700">{{ appointment.employeeName }}</dd>
+          </div>
+          <div>
+            <dt class="text-brand-muted text-xs font-semibold">Fecha</dt>
+            <dd class="mt-1 font-bold text-slate-700">{{ formatLongDate(appointment.date) }}</dd>
+          </div>
+          <div>
+            <dt class="text-brand-muted text-xs font-semibold">Horario</dt>
+            <dd class="mt-1 font-bold text-slate-700">
+              {{ appointment.startTime }} - {{ appointment.endTime }}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-brand-muted text-xs font-semibold">Duración</dt>
+            <dd class="mt-1 font-bold text-slate-700">
+              {{ formatDuration(appointment.durationMinutes) }}
+            </dd>
+          </div>
+        </dl>
+        @if (appointment.notes) {
+          <div class="mt-5">
+            <p class="text-brand-muted text-xs font-semibold">Observaciones</p>
+            <p class="mt-1 text-sm text-slate-700">{{ appointment.notes }}</p>
+          </div>
+        }
+        <div
+          class="border-brand-border mt-6 flex flex-col-reverse gap-3 border-t pt-5 sm:flex-row sm:justify-end"
+        >
+          <button
+            type="button"
+            class="border-brand-border focus-visible:ring-brand-teal min-h-11 rounded-xl border px-5 font-bold text-slate-700 outline-none focus-visible:ring-2"
+            (click)="closeDetail()"
+          >
+            Cerrar
+          </button>
+          <button
+            type="button"
+            class="bg-brand-teal hover:bg-brand-teal-hover focus-visible:ring-brand-teal min-h-11 rounded-xl px-5 font-bold text-white outline-none focus-visible:ring-4"
+            (click)="manageAppointment()"
+          >
+            Administrar cita
+          </button>
+        </div>
+      </div>
+    }
+  </dialog>
+</div>

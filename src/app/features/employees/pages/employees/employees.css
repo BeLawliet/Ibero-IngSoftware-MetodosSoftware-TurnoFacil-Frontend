@@ -1,0 +1,26 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+dialog::backdrop {
+  background: rgb(15 23 42 / 55%);
+  backdrop-filter: blur(2px);
+}
+
+dialog[open] {
+  animation: dialog-appear 120ms ease-out;
+}
+
+@keyframes dialog-appear {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.99);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog[open] {
+    animation: none;
+  }
+}
